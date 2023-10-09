@@ -1,0 +1,218 @@
+/*@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");*/
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap");
+/*@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");*/
+
+html,
+body,
+#root,
+.app {
+  font-family: "Inter", sans-serif;
+  background-color: #f5f5f5;
+}
+
+/* next/privious buttons */
+.fc-header-toolbar .fc-prev-button, 
+.fc-header-toolbar .fc-next-button {
+  background-color: #bccdfd; 
+  color: #4b67e4;
+  border: none;
+  font-size: 10px;
+  border-radius: 20px;
+  padding: 8px 10px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+.fc-direction-ltr .fc-button-group > .fc-button:not(:first-child),
+.fc-direction-ltr .fc-button-group > .fc-button:not(:last-child){
+  border-radius: 20px;
+}
+
+.fc-header-toolbar .fc-prev-button:hover, 
+.fc-header-toolbar .fc-next-button:hover {
+  background-color: #4b67e4;
+}
+
+.fc-header-toolbar .fc-prev-button:active, 
+.fc-header-toolbar .fc-next-button:active {
+  background-color: #5271FF;
+}
+
+/* today button */
+.fc-header-toolbar .fc-today-button{
+  /* background-color: #5271FF; */
+  background-color: #d6dcff;
+  color: #4b67e4;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border: none;
+}
+
+.fc-header-toolbar .fc-today-button:hover {
+  background-color: #84a5ff;
+}
+
+.fc-button-group{
+  padding: 5px;
+}
+
+.fc-header-toolbar .fc-dayGridMonth-button,
+.fc-header-toolbar .fc-timeGridWeek-button,
+.fc-header-toolbar .fc-timeGridDay-button,
+.fc-header-toolbar .fc-listMonth-button {
+  background-color: transparent;
+  color: #6B7280;
+  font-weight: 500;
+  font-size: 0.8rem;
+  padding: 0.6rem;
+  border-radius: 1rem;
+  border: none;
+}
+
+.fc-header-toolbar .fc-dayGridMonth-button:hover,
+.fc-header-toolbar .fc-timeGridWeek-button:hover,
+.fc-header-toolbar .fc-timeGridDay-button:hover,
+.fc-header-toolbar .fc-listMonth-button:hover {
+  background-color: transparent;
+  border-radius: 2rem;
+  color: #6B7280;
+  font-weight: 600;
+}
+
+/* ahaya l month,day, week...*/
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: #d6dcff;/* #4b67e4;*/
+  border-radius: 1rem;
+  color: #4b67e4;
+  font-weight: 600;
+}
+
+/* table cells */
+.fc-scrollgrid-sync-table .fc-daygrid-day-frame {
+  background-color: rgb(255, 255, 255);
+  border-radius: 15px;
+}
+
+.fc-scrollgrid-sync-table td {
+  padding: 5px;
+  border: none;
+}
+
+.fc-scrollgrid-sync-table tbody {
+  border: none;
+}
+
+.fc-scrollgrid-sync-table thead th {
+  border: none;
+}
+
+.fc .fc-daygrid-day-number {
+  font-size: 0.77rem;
+  font-weight: 600;
+}
+
+.fc .fc-col-header-cell-cushion {
+  font-size: 0.9rem;
+}
+
+/* calendar header  */
+.fc .fc-toolbar-title {
+  font-size: 1.3rem;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  border: none;
+}
+
+.fc-theme-standard th { 
+  border: none;
+}
+
+.fc-theme-standard td {
+  border: none;
+}
+
+.fc .fc-timegrid-slot-minor {
+  border: dotted 1px #e2e8f0;
+}
+
+.fc .fc-timegrid-slot-lane {
+  border: solid 1px #e2e8f0;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+  border-radius: 15px;
+}
+
+.fc-header-toolbar .fc-today-button {
+  font-size: 0.8rem;
+}
+
+.fc .fc-timegrid-slot-label-cushion {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.fc .fc-timegrid-axis-cushion {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.fc .fc-daygrid-day-bottom {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6B7280;
+}
+.fc-daygrid-dot-event .fc-event-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.fc-direction-ltr .fc-daygrid-event .fc-event-time {
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+.fc .fc-popover-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.fc-theme-standard .fc-popover-header {
+  background-color: white;
+  color: black;
+}
+.fc-theme-standard .fc-popover {
+  background-color: white;
+  color: black;
+  padding: 0.2rem;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+}
+.fc .fc-scroller::-webkit-scrollbar {
+  width: 0.3em;
+}
+.fc .fc-scroller::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.fc .fc-scroller::-webkit-scrollbar-thumb {
+  background-color: #a3b1ff;
+  border-radius: 10px;
+}
+.fc .fc-list-day-cushion, .fc .fc-list-table td {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+
+
+/* responsive calendar header  */
+@media screen and (max-width: 600px) {
+  .fc .fc-toolbar.fc-header-toolbar{
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* .ps-sidebar-root .ps-sidebar-container{
+  background-color: red;
+  position: fixed;
+  width: 220px;
+} */
