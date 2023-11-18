@@ -11,7 +11,7 @@ export const api = createApi({
     return headers;
   },
   reducerPath: "adminApi",
-  tagTypes: ['Users'],
+  tagTypes: ['Users','Client'],
   endpoints: (build) => ({
     // Define your endpoint here
     loginUser: build.mutation({
@@ -63,6 +63,15 @@ export const api = createApi({
       onError: (error) => {console.log(error);},
       invalidatesTags: ["Users"],
     }),
+    registerUser: build.mutation({
+      query: ({ user }) => ({
+        url: `/auth/register`,
+        method: "POST",
+        body: user,
+      }),
+      onError: (error) => {console.log(error);},
+      invalidatesTags: ["Users"],
+    }),
   }),
 })
 
@@ -72,4 +81,5 @@ export const {
   useForgetPasswordMutation,
   useUpdateUserMutation,
   useDeleteUserImageMutation,
+  useRegisterUserMutation,
 } = api;

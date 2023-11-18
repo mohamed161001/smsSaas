@@ -25,9 +25,9 @@ const UserSchema = new Schema ({
     },
     role: {
         type: String,
-        enum: ['dentist', 'staff', 'admin'],
+        enum: ['user', 'staff', 'admin'],
         required: true,
-        default: "dentist"
+        default: "user"
     },
     image: {
         type: String,
@@ -41,14 +41,10 @@ const UserSchema = new Schema ({
         type: String,
         enum: ['enabled', 'disabled'],
         required: true,
-        default: "disabled"
+        default: "enabled"
     },
-    dentist: {
+    client: {
         type : String,
-    },
-    codeProf: {
-        type : String,
-        default: '',
     },
     smsToken: {
         type: String,

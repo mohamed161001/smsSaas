@@ -10,7 +10,7 @@ import { styled } from '@mui/material/styles';
 
 const DropzoneContainer = styled(Box)({
   border: '2px dashed #ccc',
-  borderRadius: '5px',
+  borderRadius: '10px',
   padding: '25px',
   textAlign: 'center',
   cursor: 'pointer',
@@ -67,7 +67,7 @@ function DragNDrop({ setFile }) {
       >
         <input {...getInputProps()} />
         <Icon />
-        <Typography variant="body1" sx={{ fontWeight: '600', fontSize: '0.75rem' }}>
+        <Typography variant="body1" sx={{ fontWeight: '500', fontSize: '0.67rem' }}>
           {isDragActive
             ? isDragAccept
               ? "Drop l'image ici"

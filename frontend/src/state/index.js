@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit"
 const initialState = {
     user: null,
     token: null,
-    dentist: null,
+    client: null,
 }
 
 export const globalSlice = createSlice({
@@ -13,12 +13,12 @@ export const globalSlice = createSlice({
         setLogin: (state, action) => {
             state.user = action.payload.user,
             state.token = action.payload.token,
-            state.dentist = action.payload.dentist
+            state.client = action.payload.client
         },
         setLogout: (state) => {
             state.user = null,
             state.token = null,
-            state.dentist = null
+            state.client = null
         }
     }
 })

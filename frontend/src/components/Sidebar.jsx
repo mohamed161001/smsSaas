@@ -10,8 +10,8 @@ import { useLocation } from 'react-router-dom';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import logo from '../assets/logo.png';
-import logocollapsed from '../assets/logocollapsed.png';
+import logo from '../assets/msini.png';
+import logocollapsed from '../assets/msinicollapsed.png';
 import { Link } from 'react-router-dom';
 import { Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import {
@@ -25,6 +25,8 @@ import {
   ReceiptLongRounded,
   WeekendRounded,
   SupervisedUserCircleRounded,
+  SendRounded,
+  Groups2Rounded,
 } from "@mui/icons-material";
 
 const drawerWidth = 230;
@@ -69,9 +71,14 @@ const navItems = [
       url: "clients"
   },
   {
-      text: "Sms",
-      icon: <TodayRounded fontSize = "small" />,
-      url: "sms"
+      text: "Groupes",
+      icon: <Groups2Rounded fontSize = "small"/>,
+      url: "groups"
+  },
+  {
+      text: "Campagnes",
+      icon: <SendRounded fontSize = "small"/>,
+      url: "campaigns"
   },
 ];
 
@@ -97,9 +104,9 @@ const Sidebar = ({
             }}
            >
             {isSidebarOpen ? (
-            <img src={logo} alt="logo" style={{ width: '60%', height: 'auto', margin: '20px auto' }} />
+            <img src={logo} alt="logo" style={{ width: '55%', height: 'auto', margin: '20px auto' }} />
             ) : (
-            <img src={logocollapsed} alt="logo" style={{ width: '35%', height: 'auto', margin: '20px auto' }} />
+            <img src={logocollapsed} alt="logo" style={{ width: '50%', height: 'auto', margin: '20px auto' }} />
             )}
            </Box>
           <List>
@@ -109,14 +116,14 @@ const Sidebar = ({
                     return {
                       /*color: active ? '#000000' : '#6B7280',*/
                       color: active ? '#000000' : '#000000',
-                      backgroundColor: active ? '#E5E7EB' : 'transparent',
+                      backgroundColor: active ? '#ffefe6' : 'transparent',
                     };
                 },
                 icon: ({ active, disabled }) => {
                     return {
                       /*color: active ? '#111827' : '#6B7280',*/
                       /*color: active ? '#5271FF' : '#6B7280'*/
-                      color: active ? '#5271FF' : '#000000'
+                      color: active ? '#FF6100' : '#000000'
                     };
                 },
               }}

@@ -14,7 +14,7 @@ const auth = async (req, res, next) => {
 
         const { _id } = jwt.verify(token, process.env.SECRET)
 
-        const user = await User.findById({ _id }).select({_id})
+        const user = await User.findOne({_id})
 
         if(!user || user.status === 'disabled') {
             return res.status(401).json({ message: 'Unauthorized' });

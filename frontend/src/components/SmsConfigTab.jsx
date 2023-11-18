@@ -72,7 +72,6 @@ const CustomTextField = (props) => {
       const { data, isLoading, error } = useGetUserQuery({ id: dentist, token })
       const [updateUser, { isSuccess, isError, isLoading: isUpdating, error: updateError }] = useUpdateUserMutation()
 
-      console.log('user', data)
 
 
     // formik setup
@@ -198,32 +197,12 @@ const CustomTextField = (props) => {
                     alignItems: "center",
                     }}
                     >
-                <Button
-                 variant="outlined"
-                 sx={{
-                 backgroundColor: "#fff",
-                 color: "#5271FF",
-                 borderRadius: "7px",
-                 boxShadow: "none",
-                 fontSize: "0.65rem",
-                 fontWeight: "500",
-                 padding: "0.6rem 1.7rem",
-                 textTransform: "none",
-                 margin: "1rem 0.5rem",
-                 '&:hover': {
-                  backgroundColor: "#fff",
-                  boxShadow: "none",
-                 },
-                }}
-                >
-          Annuler
-        </Button>
         <Button
           variant="contained"
           type='submit'
           disabled={isUpdating}
           sx={{
-            backgroundColor: "#5271FF",
+            backgroundColor: "#FF6100",
             color: "#fff",
             borderRadius: "7px",
             boxShadow: "none",
@@ -233,7 +212,7 @@ const CustomTextField = (props) => {
             textTransform: "none",
             margin: "1rem 0rem",
             '&:hover': {
-              backgroundColor: "#5271FF",
+              backgroundColor: "#c94d00",
               boxShadow: "none",
             },
           }}

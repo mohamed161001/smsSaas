@@ -6,19 +6,19 @@ import { useDispatch } from "react-redux";
 export const useLogin = () => {
     const dispatch = useDispatch();
     const [ loginUser , { isLoading, error } ] = useLoginUserMutation()
-    let dentist = ""
+    let client = ""
     const login = async (email, password) => {
         const response = await loginUser({email,password}).unwrap()
         if(response?.user.role == "staff") {
-            dentist = response?.user.dentist
+            client = response?.user.client
         } else {
-            dentist = response?.user._id
+            client = response?.user._id
         }
         // Cookies.set('authToken', response?.token, { expires: 7 });
         dispatch(setLogin({
             user: response?.user,
             token: response?.token,
-            dentist: dentist
+            client: client
         }))
     }
     return { login, isLoading, error }

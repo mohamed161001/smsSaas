@@ -7,6 +7,9 @@ const cookieParser = require('cookie-parser');
 const profileRoutes = require('./routes/profileRoutes');
 const authRouter = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const clientRoutes = require('./routes/clientRoutes');
+const contactRoutes = require('./routes/contactRoutes');
+const groupRoutes = require('./routes/groupRoutes');
 const authMiddleware = require('./middlewares/auth');
 
 // express app
@@ -26,6 +29,9 @@ app.use((req, res, next) => {
 // routes
 app.use('/auth', authRouter);
 app.use('/api/user', userRoutes);
+app.use('/api/client', clientRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/group', groupRoutes);
 app.use(authMiddleware);
 app.use('/api/profile',profileRoutes);
 

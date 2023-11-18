@@ -9,11 +9,12 @@ import Alert from '@mui/material/Alert';
 import InputLabel from '@mui/material/InputLabel';
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import LockOpenRoundedIcon from '@mui/icons-material/LockOpenRounded';
+import { PhoneRounded } from '@mui/icons-material';
 import logo from '../../assets/msini.png';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { useNavigate } from "react-router-dom";
-import { useLogin } from "../../hooks/useLogin";
+import { useRegisterUserMutation } from '../../state/api';
 
 
 const CustomTextField = (props) => {
@@ -25,7 +26,7 @@ const CustomTextField = (props) => {
           fontSize: '0.75rem',
           color: '#000',
           fontWeight: '600',
-          padding: '1.1rem 0.5rem',
+          padding: '0.9rem 0.5rem',
           borderRadius: '20px',
           ...props.inputProps?.style,
         },
@@ -41,31 +42,62 @@ const CustomTextField = (props) => {
           borderRadius: '8px',
         },
         ...props.sx,
+        '& .MuiFormHelperText-root': {
+            fontSize: '0.65rem',
+            fontWeight: '600',
+            marginLeft: '0.2rem',
+            marginTop: '0.1rem',
+          },
       }}
     />
   );
 };
 
-const Login = () => {
+const Register = () => {
 
   const navigate = useNavigate();
-  const { login, isLoading, error } = useLogin();  
+
+    const [registerUser, { isLoading, error , isSuccess }] = useRegisterUserMutation();
+  
 
   const validationSchema = yup.object({
+    firstName: yup.string().required('Nom est requis'),
+    lastName: yup.string().required('Prénom est requis'),
+    phoneNumber: yup.string().required('Numéro de téléphone est requis').matches(/^[0-9]{8}$/, 'Le numéro de téléphone doit contenir 8 chiffres'),
     email: yup.string().email('Enter a valid email').required('Email est requis'),
-    password: yup.string().required('Mot de passe est requis'),
+    password: yup.string().required('Mot de passe est requis').matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        "Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial"
+      ),
   });
 
   const formik = useFormik({
-    initialValues: { email: '', password: '' },
+    initialValues: { 
+        firstName: '',
+        lastName: '',
+        phoneNumber: '',
+        email: '',
+        password: '',
+     },
     validationSchema: validationSchema,
     onSubmit: async(values) => {
-      try {
-        await login(values.email, values.password);
-        navigate("/dashboard", { replace: true });
-      } catch (error) {
-        console.error("Error during login:", error);
-      }
+        const data = {
+            firstName: values.firstName,
+            lastName: values.lastName,
+            phoneNumber: values.phoneNumber,
+            email: values.email,
+            password: values.password,
+        } 
+        try {
+            const response = await registerUser({
+                user: data,
+            });
+            if (response.data) {
+                navigate("/login", { replace: true });
+            }
+        } catch (error) {
+            console.log(error);
+        }
     },
   });
 
@@ -84,7 +116,7 @@ const Login = () => {
         </Box>
         <Box
           sx={{
-            my: 9,
+            my: 4,
             mx: 6,
             display: 'flex',
             flexDirection: 'column',
@@ -95,7 +127,7 @@ const Login = () => {
           <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid item xs={12} sm={12}>
           <Typography component="h1" variant="h5" sx={{ fontSize: "1.6rem", fontWeight: "700", color: "#000", }}>
-              Bienvenue,
+            Créer un compte
           </Typography>
           <Typography
           sx={{
@@ -106,22 +138,72 @@ const Login = () => {
               marginBottom: "0.5rem",
               }}
           >
-            Entrez vos identifiants pour vous connecter
+            Entrez vos identifiants pour créer votre compte
           </Typography>
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid item xs={12} sm={6}>
             <InputLabel
               id="demo-simple-select-label"
               sx={{
                   fontSize: "0.75rem",
                   fontWeight: "600",
                   color: "black",
+                  marginBottom: "0.7rem",
+              }}
+            >
+              Nom
+            </InputLabel>
+            <CustomTextField
+            required
+            fullWidth
+            id="firstName"
+            placeholder="Nom"
+            name="firstName"
+            onChange={formik.handleChange}
+            error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+            helperText={formik.touched.firstName && formik.errors.firstName}
+            variant="outlined"
+            size="small"
+          />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <InputLabel
+              id="demo-simple-select-label"
+              sx={{
+                  fontSize: "0.75rem",
+                  fontWeight: "600",
+                  color: "black",
+                  marginBottom: "0.7rem",
+              }}
+            >
+                Prénom
+            </InputLabel>
+            <CustomTextField
+            required
+            fullWidth
+            id="lastName"
+            placeholder="Prénom"
+            name="lastName"
+            onChange={formik.handleChange}
+            error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+            helperText={formik.touched.lastName && formik.errors.lastName}
+            variant="outlined"
+            size="small"
+          />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <InputLabel
+              id="demo-simple-select-label"
+              sx={{
+                  fontSize: "0.75rem",
+                  fontWeight: "600",
+                  color: "black",
+                  marginBottom: "0.7rem",
               }}
             >
               Email
             </InputLabel>
             <CustomTextField
-            margin="normal"
             required
             fullWidth
             id="email"
@@ -146,6 +228,43 @@ const Login = () => {
             }}
           />
           </Grid>
+          <Grid item xs={12} sm={6}>
+            <InputLabel
+              id="demo-simple-select-label"
+              sx={{
+                  fontSize: "0.75rem",
+                  fontWeight: "600",
+                  color: "black",
+                  marginBottom: "0.7rem",
+              }}
+            >
+            Numéro de téléphone
+            </InputLabel>
+            <CustomTextField
+            required
+            fullWidth
+            id="phoneNumber"
+            placeholder="Numéro de téléphone"
+            name="phoneNumber"
+            onChange={formik.handleChange}
+            error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
+            helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
+            variant="outlined"
+            size="small"
+            InputProps={{
+              startAdornment: (
+                <PhoneRounded
+                position="start"
+                sx={{
+                  color: "#000",
+                  fontSize: "1.1rem",
+                  marginRight: "0.5rem",
+                }}
+                />
+              ),
+            }}
+          />
+          </Grid>
           <Grid item xs={12} sm={12}>
             <InputLabel
               id="demo-simple-select-label"
@@ -153,7 +272,7 @@ const Login = () => {
                   fontSize: "0.75rem",
                   fontWeight: "600",
                   color: "black",
-                  marginBottom: "1rem",
+                  marginBottom: "0.7rem",
               }}
               >
               Mot de passe
@@ -185,23 +304,6 @@ const Login = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'flex-end', }}>
-            <Typography
-              sx={{
-                fontSize: "0.75rem",
-                fontWeight: "500",
-                color: "#6B7280",
-                cursor: "pointer",
-                "&:hover": {textDecoration: "underline"},
-              }}
-            >
-              <div
-                onClick={() => {navigate("/forget_pwd", { replace: true });}}
-              >
-                Mot de passe oublié ?
-              </div> 
-            </Typography>
-          </Grid>
           <Grid item xs={12} sm={12}>
             <Button
               type="submit"
@@ -217,13 +319,14 @@ const Login = () => {
                 fontWeight: "500",
                 padding: "0.75rem 1.7rem",
                 textTransform: "none",
+                marginTop: "0.8rem",
                 '&:hover': {
                   boxShadow: "none",
                   backgroundColor: "#eb5900",
                 },
               }}
             >
-              {isLoading ? "Chargement..." : "Se connecter"}
+              {isLoading ? "Chargement..." : "Créer un compte"}
             </Button>
             </Grid>
             </Grid>
@@ -233,6 +336,8 @@ const Login = () => {
               sx={{
                   mt: 2,
                   width: "100%",
+                  fontSize: "0.75rem",
+                  fontWeight: "500",
               }}
               >{error?.data?.error}</Alert>
             }
@@ -251,11 +356,11 @@ const Login = () => {
                 },
                 },
               }}>
-              Vous n'avez pas de compte ?
+                Vous avez déjà un compte ?{" "}
               <a
-                onClick={() => {navigate("/register", { replace: true });}}
+                onClick={() => {navigate("/login", { replace: true });}}
               >
-                {" "}S'inscrire
+                {" "}Connectez-vous
               </a>
               </Typography>
             </Box>
@@ -325,4 +430,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default Register

@@ -20,27 +20,25 @@ import {
   EditRounded,
   RemoveRedEyeRounded,
   DownloadRounded,
-  AddRounded,
  } from '@mui/icons-material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Link } from 'react-router-dom'
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import ConfirmDelete from '../../components/ConfirmDeletePopup';
 import { useLogout } from '../../hooks/useLogout';
-import AddContactPopup from '../../components/AddContactPoupup';
-import EditContactPopup from '../../components/EditContactPopup'
-import { useGetClientsQuery , useDeleteClientMutation } from '../../slices/ClientSlice'
+import AddGroupPopup from '../../components/AddGroupPopup'
+import { useGetGroupsQuery , useDeleteGroupMutation } from '../../slices/GroupSlice'
 import ImportListPopup from '../../components/ImportListPopup';
+import EditGroupPopup from '../../components/EditGroupPopup'
 
 
-const Clients = () => {
+const Groups = () => {
 
   const { logout } = useLogout()
 
   const navigate = useNavigate()
   const clientId = useSelector((state) => state.reducer.client)
   const token = useSelector((state) => state.reducer.token)
-  // console.log(dentistId)
 
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [sort , setSort] = useState();
@@ -53,10 +51,10 @@ const Clients = () => {
   const [openImport, setOpenImport] = useState(false);
 
 
-  const [clientToDelete, setClientToDelete] = useState(null);
+  const [groupToDelete, setGroupToDelete] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
-  const { data, error, isLoading , isFetching } = useGetClientsQuery({
+  const { data, error, isLoading , isFetching } = useGetGroupsQuery({
     page: paginationModel.page,
     pageSize: paginationModel.pageSize,
     sort: JSON.stringify(sort),
@@ -65,43 +63,42 @@ const Clients = () => {
     token
   });
 
+ //handling the delete
+ const [deleteGroup, { isLoading: isDeleting, error: deleteError }] = useDeleteGroupMutation();
 
-  //handling the delete
-  const [deleteClient, { isLoading: isDeleting, error: deleteError }] = useDeleteClientMutation();
+ const handleDeleteClick = (id) => {
+    setGroupToDelete(id);
+   setShowConfirmDelete(true);
+ };
 
-  const handleDeleteClick = (id) => {
-    setClientToDelete(id);
-    setShowConfirmDelete(true);
-  };
+ const handleConfirmDialogClose = () => {
+   setShowConfirmDelete(false);
+    setGroupToDelete(null);
+ };
 
-  const handleConfirmDialogClose = () => {
-    setShowConfirmDelete(false);
-    setClientToDelete(null);
-  };
+ const handleConfirmDelete = async () => {
+   try {
+     const res = await deleteGroup({
+       id : groupToDelete,
+       token
+     });
+     // console.log(res);
+     // close when the loading is done
+     {
+       !isDeleting && handleConfirmDialogClose();
+     }
+   } catch (err) {
+     console.log(err);
+     handleConfirmDialogClose();
+   }
+ }
 
-  const handleConfirmDelete = async () => {
-    try {
-      const res = await deleteClient({
-        id : clientToDelete,
-        token
-      });
-      // console.log(res);
-      // close when the loading is done
-      {
-        !isDeleting && handleConfirmDialogClose();
-      }
-    } catch (err) {
-      console.log(err);
-      handleConfirmDialogClose();
-    }
-  }
+ // handling the edit Group Popup
+ const [openEdit,setOpenEdit] = useState(false);
+ const [groupToEdit, setGroupToEdit] = useState(null);
 
-  // handling the edit contact popup
-  const [openEdit, setOpenEdit] = useState(false);
-  const [contactToEdit, setContactToEdit] = useState(null);
-
-  const handleEditClick = (id) => {
-    setContactToEdit(id);
+ const handleEditClick = (id) => {
+    setGroupToEdit(id);
     setOpenEdit(true);
   };
 
@@ -122,51 +119,14 @@ const Clients = () => {
       }
      },
     { 
-      field: 'firstName',
-      headerName: 'Nom Complet',
+      field: 'name',
+      headerName: 'Nom',
       flex: 1,
-      renderCell: (params) => {
-        return (
-          <Box
-          sx = {{
-            display: "flex",
-            alignItems: "center",
-          }}
-          >
-            <Typography
-            sx = {{
-              fontSize: "0.75rem",
-              fontWeight: "600",
-              color: "#111827",
-            }}
-            >{params.row.firstName} {params.row.lastName}</Typography>
-          </Box>
-        )
-      }
     },
     { 
-      field: 'phoneNumber', 
-      headerName: 'Téléphone', 
+      field: 'numberOfContacts',
+      headerName: 'Nombre de contacts', 
       flex: 0.8
-    },
-    {
-      field: 'group',
-      headerName: 'Groupe',
-      flex: 0.7,
-      renderCell: (params) => {
-        const groupName = params.value && params.value.name ? params.value.name : '';
-        return (
-          <Typography
-            sx={{
-              fontSize: "0.75rem",
-              fontWeight: "600",
-              color: "#111827",
-            }}
-          >
-            {groupName}
-          </Typography>
-        );
-      },
     },
     {
       field: 'action',
@@ -214,7 +174,7 @@ const Clients = () => {
   const localeText = {
     // Root
     rootGridLabel: 'root',
-    noRowsLabel: 'Aucun contact',
+    noRowsLabel: 'Aucun group',
     errorOverlayDefaultLabel: 'Une erreur est survenue.',
     // Rows selected footer text
     footerRowSelected: (count) =>
@@ -248,24 +208,26 @@ const Clients = () => {
     },
   };
 
+ 
+
   
 
-  useEffect(() => {
-    if (error && error.status === 401) {
-      logout()
-      console.log("unauthorized");
-    }
-    if (deleteError && deleteError.status === 401) {
-      logout()
-      console.log("unauthorized");
-    }
-  }, [error, deleteError]);
+  // useEffect(() => {
+  //   if (error && error.status === 401) {
+  //     logout()
+  //     console.log("unauthorized");
+  //   }
+  //   if (deleteError && deleteError.status === 401) {
+  //     logout()
+  //     console.log("unauthorized");
+  //   }
+  // }, [error, deleteError]);
 
 
   return (
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
-      <Header title="Contacts" subtitle="Liste des contacts"/>
+      <Header title="Groupes" subtitle="Liste des groupes"/>
       <ConfirmDelete
         open={showConfirmDelete}
         onClose={handleConfirmDialogClose}
@@ -273,20 +235,20 @@ const Clients = () => {
         isLoading={isDeleting}
       />
       <ImportListPopup open={openImport} setOpen={setOpenImport}/>
-      <AddContactPopup  open={open} setOpen={setOpen}/>
-      <EditContactPopup open={openEdit} setOpen={setOpenEdit} contactId={contactToEdit}/>
+      <AddGroupPopup  open={open} setOpen={setOpen}/>
+      <EditGroupPopup open={openEdit} setOpen={setOpenEdit} groupToEdit={groupToEdit}/>
       <Button 
       onClick={() => setOpen(true)}
       variant="contained"
       size="medium"
-      startIcon={<AddRounded/>}
+      startIcon={<AddCircleOutlineRoundedIcon/>}
       sx = {{
         backgroundColor: "#f55d00",
         color: "white",
-        borderRadius: "7px",
+        borderRadius: "30px",
         textTransform: "none",
-        fontSize: "0.65rem",
-        padding: "0.61rem 0.9rem",
+        fontSize: "0.7rem",
+        padding: "0.7rem 1.2rem",
         boxShadow: "none",  
         '&:hover': {
           boxShadow: "none",
@@ -294,7 +256,7 @@ const Clients = () => {
           backgroundColor: "#eb5900",
         },
       }}
-      >Ajouter un contact</Button>
+      >Ajouter un groupe</Button>
       </FlexBetween>
       <Box
            sx = {{
@@ -312,7 +274,7 @@ const Clients = () => {
                 padding="0.1rem 1rem"
                 >
                   <InputBase
-                    placeholder="Rechercher un contact"
+                    placeholder="Rechercher un groupe"
                     onChange={(e) => setSearch(e.target.value)}
                     sx={{color:"#000", fontSize:"0.7rem", fontWeight:"600"}}
                   />
@@ -321,33 +283,6 @@ const Clients = () => {
                   </IconButton>
                 </FlexBetween>
                 </FlexBetween>
-                <Button
-                variant="contained"
-                onClick={() => setOpenImport(true)}
-                size="medium"
-                startIcon={
-                <DownloadRounded/>
-              }
-                sx = {{
-                  backgroundColor: "white",
-                  color: "#f55d00",
-                  border : "1px solid #f55d00",
-                  borderRadius: "0.5rem",
-                  textTransform: "none",
-                  fontSize: "0.65rem",
-                  fontWeight: "600",
-                  padding: "0.45rem 1.3rem",
-                  boxShadow: "none",  
-                  '&:hover': {
-                    boxShadow: "none",
-                    backgroundColor: "white",
-                  },
-                  // make the icon smaller
-                  '& .MuiSvgIcon-root': {
-                    fontSize: "0.95rem",
-                  },
-                }}
-                >Importer</Button>
             </FlexBetween>
       <Box
       mt="8px"
@@ -363,11 +298,11 @@ const Clients = () => {
       >
         <DataGrid
         // set the rows
-        rows={data && data.contacts || []}
+        rows={data && data.groups || []}
         columns={columns}
         getRowId={(row) => row._id}
-        loading={isFetching}
-        rowCount={data && data.totalcontacts || 0}
+        loading={isLoading || isFetching}
+        rowCount={data && data.totalgroups || 0}
         pagination
         paginationModel={paginationModel}
         paginationMode="server"
@@ -452,4 +387,4 @@ const Clients = () => {
   )
 }
 
-export default Clients
+export default Groups

@@ -81,7 +81,7 @@ function Settings() {
 
     const [value, setValue] = React.useState(0);
     const user = useSelector((state) => state.reducer.user);
-    const isDentist = user?.role === 'dentist';
+    const isUser = user?.role === 'user';
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -106,7 +106,7 @@ function Settings() {
                 }}
               TabIndicatorProps={{
                 style: {
-                  backgroundColor: '#5271FF',
+                  backgroundColor: '#FF6100',
                   borderRadius: '20px',
                   width: '0.2rem',
                 }
@@ -131,8 +131,8 @@ function Settings() {
                     display: 'flex',
                     alignItems: 'start',
                     '&.Mui-selected': {
-                        color:'#5271FF',
-                        backgroundColor: '#E5E7Eb',
+                        color:'#FF6100',
+                        backgroundColor: '#ffefe6',
                     },
                     '&:hover': {
                         backgroundColor: '#efefef',
@@ -142,7 +142,7 @@ function Settings() {
                 }}
               />
               {
-                isDentist &&
+                isUser &&
                 <Tab  
                 label={
                   <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -162,8 +162,8 @@ function Settings() {
                     display: 'flex',
                     alignItems: 'start',
                     '&.Mui-selected': {
-                        color:'#5271FF',
-                        backgroundColor: '#E5E7Eb',
+                      color:'#FF6100',
+                      backgroundColor: '#ffefe6',
                     },
                     '&:hover': {
                       backgroundColor: '#efefef',
@@ -191,8 +191,8 @@ function Settings() {
                     display: 'flex',
                     alignItems: 'start',
                     '&.Mui-selected': {
-                        color:'#5271FF',
-                        backgroundColor: '#E5E7Eb',
+                      color:'#FF6100',
+                      backgroundColor: '#ffefe6',
                     },
                     '&:hover': {
                       backgroundColor: '#efefef',
@@ -213,13 +213,15 @@ function Settings() {
                     <ProfileTab />
                 </Stack>
               </TabPanel>
-
+             { isUser &&
               <TabPanel value={value} index={1}>
                 <Stack>
                 <SmsConfigTab />
                 </Stack>
               </TabPanel>
-              <TabPanel value={value} index={2}>
+              }
+
+              <TabPanel value={value} index={isUser ? 2 : 1}>
                 <Stack>
                 <EditPasswordTab />
                 </Stack>

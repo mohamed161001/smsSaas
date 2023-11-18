@@ -312,7 +312,7 @@ const CustomTextField = (props) => {
           type='submit'
           disabled={isUpdating}
           sx={{
-            backgroundColor: "#5271FF",
+            backgroundColor: "#FF6100",
             color: "#fff",
             borderRadius: "7px",
             boxShadow: "none",
@@ -322,7 +322,7 @@ const CustomTextField = (props) => {
             textTransform: "none",
             margin: "1rem 0rem",
             '&:hover': {
-              backgroundColor: "#5271FF",
+              backgroundColor: "#c94d00",
               boxShadow: "none",
             },
           }}
