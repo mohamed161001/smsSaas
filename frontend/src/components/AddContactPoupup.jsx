@@ -15,6 +15,8 @@ import {
   IconButton,
   OutlinedInput,
   Alert,
+  Autocomplete,
+  List,
 } from '@mui/material';
 import { 
     Visibility,
@@ -51,6 +53,10 @@ const CustomTextField = (props) => {
         '& fieldset': {
           borderColor: '#F5F5F5',
         },
+        '&.Mui-focused fieldset': {
+          // borderColor: 'black',
+          borderWidth: '1px',
+        },
         borderRadius: '8px',
       },
       ...props.sx,
@@ -60,6 +66,12 @@ const CustomTextField = (props) => {
         fontWeight: '600',
         marginLeft: '0.2rem',
         marginTop: '0.1rem',
+      },
+      '&.Mui-focused': {
+        '.MuiOutlinedInput-notchedOutline': {
+          // borderColor: 'black',
+          borderWidth: '1px',
+        },
       },
     }}
     />
@@ -72,17 +84,21 @@ const CustomTextField = (props) => {
     const { logout } = useLogout()
     const [showPassword, setShowPassword] = useState(false);
     const client = useSelector((state) => state.reducer.client)
+    const [search , setSearch] = useState("");
     
     const token = useSelector((state) => state.reducer.token)
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [sort , setSort] = useState();
-    const { data,isLoading: isLoadingGroups, error: errorGroups } = useGetGroupsQuery({
+    const { data,isLoading: isLoadingGroups, error: errorGroups,isFetching : isFetchingGroups } = useGetGroupsQuery({
       page: paginationModel.page,
       pageSize: paginationModel.pageSize,
       sort: JSON.stringify(sort),
       clientID: client,
+      search: search,
       token
     });
+
+    console.log(data)
 
 
     const [addClient, { isLoading, error }] = useAddClientMutation();
@@ -91,22 +107,22 @@ const CustomTextField = (props) => {
     
     const validationSchema = yup.object({
         firstName: yup.string().required('Champ obligatoire'),
-        lastName: yup.string().required('Champ obligatoire'),
+        // lastName: yup.string().required('Champ obligatoire'),
         phoneNumber: yup.string().required('Champ obligatoire').matches(/^[0-9]{8}$/, 'Le numéro de téléphone doit contenir 8 chiffres'),
     });
 
     const formik = useFormik({
         initialValues: {
             firstName: '',
-            lastName: '',
+            // lastName: '',
             phoneNumber: '',
-            group : '',
+            group : [],
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             const data = {
                 firstName: values.firstName,
-                lastName: values.lastName,
+                // lastName: values.lastName,
                 phoneNumber: values.phoneNumber,
                 client: client,
             }
@@ -118,10 +134,18 @@ const CustomTextField = (props) => {
                     client: data,
                     token
                 });
+                
+                // if the response is an error set the popup error
+                if (response.error) {
+                  setPopupError(response.error.data.error);
+                    return;
+                }
                 setOpen(false);
                 formik.resetForm();
             } catch (error) {
                 console.log(error);
+                // set the popup error
+                setPopupError(error.message);
             }
         },
   });
@@ -171,7 +195,7 @@ const CustomTextField = (props) => {
     <DialogContent dividers> 
       <form onSubmit={formik.handleSubmit} autoComplete="off" noValidate enctype="multipart/form-data">
           <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={12}>
                   <InputLabel
                   sx = {{
                       fontSize: "0.75rem",
@@ -193,9 +217,11 @@ const CustomTextField = (props) => {
                   variant="outlined"
                   placeholder="Nom du contact"
                   size="small"
+                  // take of the auto complete
+                  autoComplete="off"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                {/* <Grid item xs={12} sm={6}>
                     <InputLabel
                     sx = {{
                         fontSize: "0.75rem",
@@ -217,8 +243,9 @@ const CustomTextField = (props) => {
                     variant="outlined"
                     placeholder="Prénom du contact"
                     size="small"
+                    autoComplete="off"
                     />
-                </Grid>
+                </Grid> */}
                     <Grid item xs={12} sm={12}>
                     <InputLabel
                     sx = {{
@@ -241,6 +268,7 @@ const CustomTextField = (props) => {
                     variant="outlined"
                     size="small"
                     placeholder="Téléphone du contact"
+                    autoComplete="off"
                     // add icon in the input
                     InputProps={{
                         startAdornment: (
@@ -262,49 +290,136 @@ const CustomTextField = (props) => {
                     >
                         Groupe
                     </InputLabel>
-                    <Select
-                    fullWidth
+                    <Autocomplete
+                    multiple
                     id="group"
                     name="group"
-                    value = {formik.values.group}
-                    onChange = {formik.handleChange}
-                    error = {formik.touched.group && Boolean(formik.errors.group)}
-                    helperText = {formik.touched.group && formik.errors.group}
-                    variant="outlined"
-                    size="small"
-                    placeholder="Groupe du contact"
-                    sx = {{
-                      backgroundColor: "#f2f2f2",
-                      borderRadius: "8px",
-                      fontSize: "0.75rem",
-                      fontWeight: "600",
-                      padding: "0.15rem 0.4rem",
-                      '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#f2f2f2',
+                    value={formik.values.group || []}
+                    // search from backend
+                    onInputChange={(event, value) => {
+                      setSearch(value);
+                    }}
+                    // add loading
+                    loading={isFetchingGroups}
+                    noOptionsText={
+                      <span
+                        style={{
+                          fontSize: '0.8rem',
+                          fontWeight: '600',   
+                        }}
+                      >
+                        Aucun groupe trouvé
+                      </span>
+                    }
+                    loadingText={
+                      <span
+                        style={{
+                          fontSize: '0.8rem',
+                          fontWeight: '600',
+                        }}
+                      >
+                        Chargement...
+                      </span>
+                    }
+                    onChange={(event, value) => formik.setFieldValue('group', value)}
+                    options={data?.groups || []}
+                    getOptionLabel={(option) => option.name}
+                    isOptionEqualToValue={(option, value) => option._id === value._id}
+                    filterSelectedOptions
+                    disableCloseOnSelect
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="outlined"
+                        placeholder="Groupe du contact"
+                        size="small"
+                        autoComplete="off"
+                      />
+                    )}
+                    // do the loading effect
+                    renderOption={(props, option) => {
+                      return (
+                          <MenuItem
+                          {...props} key={data?._id} value={data?._id}
+                            sx={{
+                              fontSize: '0.75rem',
+                              fontWeight: '600',
+                            }}
+                          >
+                            {option.name}
+                          </MenuItem>
+                      );
+                    }}
+                    //make it look like the above select
+                    sx={{
+                      backgroundColor: '#f2f2f2',
+                      borderRadius: '8px',
+                      fontSize: '0.7rem',
+                      fontWeight: '600',
+                      // also make the input look like the above select
+                      '& .MuiAutocomplete-inputRoot.MuiInputBase-root': {
+                        padding: '0.5rem 0.4rem',
+                        borderRadius: '8px',
                       },
-                  }}
-                  MenuProps={{
-                      // set a max height to the menu list
-                      sx: {
-                        maxHeight: '300px',
+                      '.MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#f2f2f2',
+                      },
+                      '& .MuiAutocomplete-input': {
+                        fontSize: '0.75rem',
+                        fontWeight: '600',
+                      },
+                      '& .MuiAutocomplete-tag': {
+                        marginTop: '0.2rem',
+                        marginBottom: '0.2rem',
+                        color: '#000',
+                        fontSize: '0.65rem',
+                        fontWeight: '500',
+                        height: '1.7rem',
+                      },
+                      // style the cancel icon
+                      '& .MuiChip-root .MuiChip-deleteIcon': {
+                        fontSize: '1.15rem',
+                      },
+                      '& .MuiAutocomplete-inputRoot.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#1976d2',
+                        borderWidth: '1px',
+                    },
+                    }}
+                    ListboxProps={{
+                      style: {
+                        maxHeight: '150px',
                       },
                     }}
-                    >
-                        <MenuItem value="" disabled sx={{ fontSize: '0.68rem', fontWeight: '600' }}>Groupe du contact</MenuItem>
-                        {data?.groups?.map((group) => (
-                          <MenuItem key={group._id} value={group._id} sx={{ fontSize: '0.68rem', fontWeight: '600' }}>
-                            {group.name}
-                          </MenuItem>
-                        ))}
-                    </Select>
+                    ListboxComponent = {props => {
+                      return (
+                        <List {...props} sx={{
+                          width: '100%', maxWidth: 500, bgcolor: 'background.paper' , maxHeight: '250px', overflow: 'auto',
+                          // style for the scrollbar
+                          '&::-webkit-scrollbar': {
+                            width: '0.3em',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            backgroundColor: 'black',
+                            borderRadius: '100px',
+                        },
+                          }}>
+                          {props.children}
+                        </List>
+                      )
+                    }}
+                  />
                     </Grid>
                 <Grid item xs={12} sm={12}>
                     {popupError && (
                         <Alert 
                         severity="error"
                         sx={{
-                            fontSize: "0.65rem",
+                            fontSize: "0.67rem",
                             fontWeight: "600",
+                            // make the icon and the text align vertically
+                            display: "flex",
+                            alignItems: "center",
+
                         }}
                         >{popupError}</Alert>
                     )}
@@ -327,8 +442,8 @@ const CustomTextField = (props) => {
             }}
           sx={{
             backgroundColor: "#fff",
-            color: "#f55d00",
-            borderColor: "#f55d00",
+            color: "black",
+            borderColor: "black",
             borderRadius: "7px",
             boxShadow: "none",
             fontSize: "0.65rem",
@@ -339,7 +454,8 @@ const CustomTextField = (props) => {
             '&:hover': {
               backgroundColor: "#fff",
               boxShadow: "none",
-              borderColor: "#eb5900",
+              borderColor: "#2b2b2b",
+              color: "#2b2b2b",
             },
           }}
         >
@@ -350,7 +466,7 @@ const CustomTextField = (props) => {
           disabled={isLoading}
           type='submit'
           sx={{
-            backgroundColor: "#f55d00",
+            backgroundColor: "black",
             color: "#fff",
             borderRadius: "7px",
             boxShadow: "none",
@@ -360,7 +476,7 @@ const CustomTextField = (props) => {
             textTransform: "none",
             margin: "1rem 0rem",
             '&:hover': {
-              backgroundColor: "#eb5900",
+              backgroundColor: "#2b2b2b",
               boxShadow: "none",
             },
           }}
