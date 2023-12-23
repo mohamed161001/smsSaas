@@ -5,6 +5,8 @@ const {
     createContact,
     deleteContact,
     updateContact,
+    createContacts,
+    getGroupContacts
 } = require('../controllers/contactController')
 const router = express.Router()
 
@@ -19,5 +21,9 @@ router.post('/',createContact)
 router.patch('/:id',updateContact)
 // delete a contact
 router.delete('/:id',deleteContact)
+// create contacts
+router.post('/createContacts', createContacts)
+// get group contacts
+router.get('/groupContacts/:id', getGroupContacts)
 
 module.exports = router

@@ -20,6 +20,7 @@ import {
   EditRounded,
   RemoveRedEyeRounded,
   DownloadRounded,
+  AddRounded,
  } from '@mui/icons-material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Link } from 'react-router-dom'
@@ -62,6 +63,8 @@ const Groups = () => {
     search: search,
     token
   });
+
+  console.log(data);
 
  //handling the delete
  const [deleteGroup, { isLoading: isDeleting, error: deleteError }] = useDeleteGroupMutation();
@@ -212,16 +215,16 @@ const Groups = () => {
 
   
 
-  // useEffect(() => {
-  //   if (error && error.status === 401) {
-  //     logout()
-  //     console.log("unauthorized");
-  //   }
-  //   if (deleteError && deleteError.status === 401) {
-  //     logout()
-  //     console.log("unauthorized");
-  //   }
-  // }, [error, deleteError]);
+  useEffect(() => {
+    if (error && error.status === 401) {
+      logout()
+      console.log("unauthorized");
+    }
+    if (deleteError && deleteError.status === 401) {
+      logout()
+      console.log("unauthorized");
+    }
+  }, [error, deleteError]);
 
 
   return (
@@ -241,14 +244,15 @@ const Groups = () => {
       onClick={() => setOpen(true)}
       variant="contained"
       size="medium"
-      startIcon={<AddCircleOutlineRoundedIcon/>}
+      startIcon={<AddRounded/>}
       sx = {{
-        backgroundColor: "#f55d00",
+        backgroundColor: "black",
         color: "white",
-        borderRadius: "30px",
+        borderRadius: "7px",
         textTransform: "none",
-        fontSize: "0.7rem",
-        padding: "0.7rem 1.2rem",
+        fontSize: "0.65rem",
+        fontWeight : "600",
+        padding: "0.61rem 0.9rem",
         boxShadow: "none",  
         '&:hover': {
           boxShadow: "none",
@@ -379,6 +383,16 @@ const Groups = () => {
             fontWeight: "600",
             color : "#111827",
           }, 
+          // style the loading spinner
+          "& .MuiCircularProgress-root": {
+            color: "black",
+            width: "1.7rem !important",
+            height: "1.7rem !important",
+          },
+          // take off the focus color of the cells
+          "& .MuiDataGrid-cell:focus": {
+            outline: "none",
+          },
          }}
         />
         </Box>

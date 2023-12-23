@@ -3,7 +3,7 @@ const {
     getClients,
     getClient,
     updateClient,
-    deleteClient
+    deleteClient,
 } = require('../controllers/clientController')
 const router = express.Router()
 

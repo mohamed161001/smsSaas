@@ -18,21 +18,27 @@ const contactSchema = new Schema({
         required: true,
         default: ""
     },
-    lastName: {
-        type: String,
-        required: true,
-        default: ""
-    },
+    // lastName: {
+    //     type: String,
+    //     required: true,
+    //     default: ""
+    // },
     phoneNumber: {
         type: String,
         required: true,
         default: ""
     },
+    // an array of groups
     group: {
-        type : mongoose.Types.ObjectId,
+        type: [mongoose.Types.ObjectId],
         ref: 'Group',
-        default: null
+        default: []
     },
+    // group: {
+    //     type : mongoose.Types.ObjectId,
+    //     ref: 'Group',
+    //     default: null
+    // },
     // additionalPhoneNumber: {
     //     type: String,
     //     required: false,

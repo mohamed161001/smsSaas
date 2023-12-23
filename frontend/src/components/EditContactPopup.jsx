@@ -16,6 +16,8 @@ import {
   OutlinedInput,
   Alert,
   Skeleton,
+  Autocomplete,
+  List,
 } from '@mui/material';
 import { 
     Visibility,
@@ -52,6 +54,10 @@ const CustomTextField = (props) => {
         '& fieldset': {
           borderColor: '#F5F5F5',
         },
+        '&.Mui-focused fieldset': {
+          // borderColor: 'black',
+          borderWidth: '1px',
+        },
         borderRadius: '8px',
       },
       ...props.sx,
@@ -61,6 +67,12 @@ const CustomTextField = (props) => {
         fontWeight: '600',
         marginLeft: '0.2rem',
         marginTop: '0.1rem',
+      },
+      '&.Mui-focused': {
+        '.MuiOutlinedInput-notchedOutline': {
+          // borderColor: 'black',
+          borderWidth: '1px',
+        },
       },
     }}
     />
@@ -76,11 +88,14 @@ const CustomTextField = (props) => {
 
     
     const token = useSelector((state) => state.reducer.token)
+    const [search, setSearch] = useState("");
     
     const { data, isLoading , error , isFetching } = useGetClientQuery({
         token,
         id: contactId
     })
+
+
    
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [sort , setSort] = useState();
@@ -89,8 +104,10 @@ const CustomTextField = (props) => {
       pageSize: paginationModel.pageSize,
       sort: JSON.stringify(sort),
       clientID: client,
+      search: search,
       token
     });
+
 
     const [updateClient, { isLoading : updateClientIsLoading , error : updateClientError }] = useUpdateClientMutation();
 
@@ -98,16 +115,16 @@ const CustomTextField = (props) => {
     const [popupError, setPopupError] = useState('');
     
     const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
+    // const [lastName, setLastName] = useState('')
     const [phoneNumber, setPhoneNumber] = useState('')
-    const [group, setGroup] = useState('')
+    const [group, setGroup] = useState([]);
 
     useEffect(() => {
         if (open && data) {
             setFirstName(data?.firstName)
-            setLastName(data?.lastName)
+            // setLastName(data?.lastName)
             setPhoneNumber(data?.phoneNumber)
-            setGroup(data?.group)
+            setGroup(data?.group || []);
         }
     }, [data , open])
 
@@ -116,10 +133,11 @@ const CustomTextField = (props) => {
         e.preventDefault();
         const payload = {
             firstName,
-            lastName,
+            // lastName,
             phoneNumber,
             group,
         };
+        console.log('payload',payload);
       const response = await updateClient({
         id : contactId,
         token,
@@ -143,9 +161,9 @@ const CustomTextField = (props) => {
       if (!open) {
           setPopupError('');
           setFirstName('');
-          setLastName('');
+          // setLastName('');
           setPhoneNumber('');
-          setGroup('');
+          setGroup([]);
       }
   }, [open]);
 
@@ -164,7 +182,7 @@ const CustomTextField = (props) => {
       setOpen(false);
       setPopupError('');
       setFirstName('');
-      setLastName('');
+      // setLastName('');
       setPhoneNumber('');
     }}
     sx = {{
@@ -198,7 +216,7 @@ const CustomTextField = (props) => {
     ) : (
       <form onSubmit={(e) => handleSubmit(e)} autoComplete="off" noValidate enctype="multipart/form-data">
           <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={12}>
                   <InputLabel
                   sx = {{
                       fontSize: "0.75rem",
@@ -220,7 +238,7 @@ const CustomTextField = (props) => {
                   size="small"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                {/* <Grid item xs={12} sm={6}>
                     <InputLabel
                     sx = {{
                         fontSize: "0.75rem",
@@ -241,7 +259,7 @@ const CustomTextField = (props) => {
                     placeholder="Prénom du contact"
                     size="small"
                     />
-                </Grid>
+                </Grid> */}
                     <Grid item xs={12} sm={12}>
                     <InputLabel
                     sx = {{
@@ -283,39 +301,129 @@ const CustomTextField = (props) => {
                     >
                         Groupe
                     </InputLabel>
-                    <Select
-                    fullWidth
+                    <Autocomplete
+                    multiple
                     id="group"
                     name="group"
-                    value = {group}
-                    onChange = {(e) => setGroup(e.target.value)}
-                    variant="outlined"
-                    size="small"
-                    placeholder="Groupe du contact"
-                    sx = {{
-                      backgroundColor: "#f2f2f2",
-                      borderRadius: "8px",
-                      fontSize: "0.75rem",
-                      fontWeight: "600",
-                      padding: "0.15rem 0.4rem",
-                      '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#f2f2f2',
+                    value={group}
+                    // search from backend
+                    onInputChange={(event, value) => setSearch(value)}
+                    // add loading
+                    loading={isFetching || groupsIsLoading}
+                    noOptionsText={
+                      <span
+                        style={{
+                          fontSize: '0.8rem',
+                          fontWeight: '600',   
+                        }}
+                      >
+                        Aucun groupe trouvé
+                      </span>
+                    }
+                    loadingText={
+                      <span
+                        style={{
+                          fontSize: '0.8rem',
+                          fontWeight: '600',
+                        }}
+                      >
+                        Chargement...
+                      </span>
+                    }
+                    onChange={(event, value) => setGroup(value)}
+                    options={groupsData?.groups || []}
+                    getOptionLabel={
+                      (option) => 
+                      option.name  || 'No Name'
+                    }
+                    isOptionEqualToValue={(option, value) => option._id === value._id}
+                    filterSelectedOptions
+                    disableCloseOnSelect
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="outlined"
+                        placeholder="Groupe du contact"
+                        size="small"
+                        autoComplete="off"
+                      />
+                    )}
+                    // do the loading effect
+                    renderOption={(props, option) => {
+                      return (
+                          <MenuItem
+                          {...props} key={option._id} value={option._id}
+                            sx={{
+                              fontSize: '0.75rem',
+                              fontWeight: '600',
+                            }}
+                          >
+                            {option.name}
+                          </MenuItem>
+                      );
+                    }}
+                    //disable the option if it is already selected
+                    getOptionDisabled={(option) =>
+                      group.some((selectedOption) => selectedOption._id === option._id)
+                    }
+                    //make it look like the above select
+                    sx={{
+                      backgroundColor: '#f2f2f2',
+                      borderRadius: '8px',
+                      fontSize: '0.7rem',
+                      fontWeight: '600',
+                      // also make the input look like the above select
+                      '& .MuiAutocomplete-inputRoot.MuiInputBase-root': {
+                        padding: '0.5rem 0.4rem',
+                        borderRadius: '8px',
                       },
-                  }}
-                  MenuProps={{
-                      // set a max height to the menu list
-                      sx: {
-                        maxHeight: '300px',
+                      '.MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#f2f2f2',
+                      },
+                      '& .MuiAutocomplete-input': {
+                        fontSize: '0.75rem',
+                        fontWeight: '600',
+                      },
+                      '& .MuiAutocomplete-tag': {
+                        marginTop: '0.2rem',
+                        marginBottom: '0.2rem',
+                        color: '#000',
+                        fontSize: '0.65rem',
+                        fontWeight: '500',
+                        height: '1.7rem',
+                      },
+                      // style the cancel icon
+                      '& .MuiChip-root .MuiChip-deleteIcon': {
+                        fontSize: '1.15rem',
+                      },
+                      '& .MuiAutocomplete-inputRoot.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#1976d2',
+                        borderWidth: '1px',
+                    },
+                    }}
+                    ListboxProps={{
+                      style: {
+                        maxHeight: '150px',
                       },
                     }}
-                    >
-                        <MenuItem value="" disabled sx={{ fontSize: '0.68rem', fontWeight: '600' }}>Groupe du contact</MenuItem>
-                        {groupsData?.groups?.map((group) => (
-                          <MenuItem key={group._id} value={group._id} sx={{ fontSize: '0.68rem', fontWeight: '600' }}>
-                            {group.name}
-                          </MenuItem>
-                        ))}
-                    </Select>
+                    ListboxComponent = {props => {
+                      return (
+                        <List {...props} sx={{
+                          width: '100%', maxWidth: 500, bgcolor: 'background.paper' , maxHeight: '250px', overflow: 'auto',
+                          // style for the scrollbar
+                          '&::-webkit-scrollbar': {
+                            width: '0.3em',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            backgroundColor: 'black',
+                            borderRadius: '100px',
+                        },
+                          }}>
+                          {props.children}
+                        </List>
+                      )
+                    }}
+                  />
                     </Grid>
                 <Grid item xs={12} sm={12}>
                     {popupError && (
@@ -343,13 +451,13 @@ const CustomTextField = (props) => {
             onClick={() => {
                 setOpen(false);
                 setFirstName('');
-                setLastName('');
+                // setLastName('');
                 setPhoneNumber('');
             }}
           sx={{
             backgroundColor: "#fff",
-            color: "#f55d00",
-            borderColor: "#f55d00",
+            color: "black",
+            borderColor: "black",
             borderRadius: "7px",
             boxShadow: "none",
             fontSize: "0.65rem",
@@ -360,7 +468,8 @@ const CustomTextField = (props) => {
             '&:hover': {
               backgroundColor: "#fff",
               boxShadow: "none",
-              borderColor: "#eb5900",
+              borderColor: "#2b2b2b",
+              color: "#2b2b2b",
             },
           }}
         >
@@ -371,8 +480,8 @@ const CustomTextField = (props) => {
           disabled={updateClientIsLoading || isFetching}
           type='submit'
           sx={{
-            backgroundColor: "#f55d00",
-            color: "#fff",
+            backgroundColor: "black",
+            color: "white",
             borderRadius: "7px",
             boxShadow: "none",
             fontSize: "0.65rem",
@@ -381,7 +490,7 @@ const CustomTextField = (props) => {
             textTransform: "none",
             margin: "1rem 0rem",
             '&:hover': {
-              backgroundColor: "#eb5900",
+              backgroundColor: "#2b2b2b",
               boxShadow: "none",
             },
           }}

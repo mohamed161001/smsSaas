@@ -10,20 +10,28 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
 const ConfirmDelete = ({ open, onClose, onConfirm,isLoading }) => {
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog 
+    open={open}
+    onClose={onClose}
+    sx = {{
+        '& .MuiDialog-paper': {
+            borderRadius: "10px",
+        },
+    }}
+    >
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2 }}>
             <WarningAmberRoundedIcon 
             sx={{ 
-            color: "#d32f2f",
+            color: "#ff1b1b",
             fontSize: "3.5rem",
-            backgroundColor: "#ffefef",
+            backgroundColor: "transparent",
             borderRadius: "50%",
             padding: "0.6rem",
             }} />
         </Box>
 
         <DialogTitle textAlign="center">
-            <Typography variant="h5" sx={{ fontWeight: "700" , fontSize: "1.1rem" }}>
+            <Typography variant="h5" sx={{ fontWeight: "700" , fontSize: "1.1rem",color:'black' }}>
                 Confirmation de suppression
             </Typography>
         </DialogTitle>
@@ -31,8 +39,8 @@ const ConfirmDelete = ({ open, onClose, onConfirm,isLoading }) => {
         <DialogContent>
             <Typography variant="body1" 
               sx={{ 
-                fontWeight: "500" ,
-                fontSize: "0.85rem",
+                fontWeight: "600" ,
+                fontSize: "0.75rem",
                 color : "#6b6b6b",
             }}
               >
@@ -46,18 +54,18 @@ const ConfirmDelete = ({ open, onClose, onConfirm,isLoading }) => {
                 variant='outlined'
                 sx={{
                     backgroundColor: "#fff",
-                    color: "#d32f2f",
-                    borderColor: "#d32f2f",
+                    color: "black",
+                    borderColor: "transparent",
                     borderRadius: "7px",
                     boxShadow: "none",
                     fontSize: "0.6rem",
-                    fontWeight: "500",
+                    fontWeight: "600",
                     padding: "0.6rem 1.5rem",
                     textTransform: "none",
                     '&:hover': {
                       backgroundColor: "#fff",
                       boxShadow: "none",
-                      borderColor: "#d32f2f",
+                      borderColor: "black",
                     },
                   }}
             >
@@ -70,15 +78,16 @@ const ConfirmDelete = ({ open, onClose, onConfirm,isLoading }) => {
                 autoFocus
                 disabled={isLoading}
                 sx={{
-                    backgroundColor: "#d32f2f",
+                    backgroundColor: "black",
                     color: "#fff",
                     borderRadius: "7px",
                     boxShadow: "none",
                     fontSize: "0.6rem",
-                    fontWeight: "500",
+                    fontWeight: "600",
                     padding: "0.6rem 1.5rem",
                     textTransform: "none",
                     '&:hover': {
+                      backgroundColor: "#2b2b2b",
                       boxShadow: "none",
                     },
                   }}

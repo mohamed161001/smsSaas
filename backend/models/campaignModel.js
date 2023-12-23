@@ -7,7 +7,7 @@ const campaignSchema = new Schema({
         required: true,
         default: ""
     },
-    sms: {
+    message: {
         type: String,
         required: true,
         default: ""
@@ -16,7 +16,7 @@ const campaignSchema = new Schema({
         type: String,
         required: false,
         default: "En attente",
-        enum: ["En attente", "En cours", "Terminé"]
+        enum: ["En attente", "En cours", "Terminé","Programmé"]
     },
     scheduledTime: {
         type: Date,

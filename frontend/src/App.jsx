@@ -9,6 +9,7 @@ import Groups from './scenes/groups/Groups';
 import Settings from './scenes/settings/Settings';
 import ForgetPassword from './scenes/forget-password/ForgetPassword';
 import Campaigns from './scenes/campaigns/Campaigns';
+import CreateCampaign from './scenes/campaigns/CreateCampaign';
 import { useSelector } from 'react-redux';
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
           <Route path="/clients" element={<Clients />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/campaigns" element={<Campaigns />} />
+          <Route path="/campaigns/create_campaign" element={<CreateCampaign />} />
           <Route path="/settings" element={<Settings />} />
           </Route>
         </Routes>

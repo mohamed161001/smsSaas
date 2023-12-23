@@ -65,6 +65,8 @@ const Clients = () => {
     token
   });
 
+  console.log(data)
+
 
   //handling the delete
   const [deleteClient, { isLoading: isDeleting, error: deleteError }] = useDeleteClientMutation();
@@ -125,24 +127,24 @@ const Clients = () => {
       field: 'firstName',
       headerName: 'Nom Complet',
       flex: 1,
-      renderCell: (params) => {
-        return (
-          <Box
-          sx = {{
-            display: "flex",
-            alignItems: "center",
-          }}
-          >
-            <Typography
-            sx = {{
-              fontSize: "0.75rem",
-              fontWeight: "600",
-              color: "#111827",
-            }}
-            >{params.row.firstName} {params.row.lastName}</Typography>
-          </Box>
-        )
-      }
+      // renderCell: (params) => {
+      //   return (
+      //     <Box
+      //     sx = {{
+      //       display: "flex",
+      //       alignItems: "center",
+      //     }}
+      //     >
+      //       <Typography
+      //       sx = {{
+      //         fontSize: "0.75rem",
+      //         fontWeight: "600",
+      //         color: "#111827",
+      //       }}
+      //       >{params.row.firstName} {params.row.lastName}</Typography>
+      //     </Box>
+      //   )
+      // }
     },
     { 
       field: 'phoneNumber', 
@@ -154,18 +156,31 @@ const Clients = () => {
       headerName: 'Groupe',
       flex: 0.7,
       renderCell: (params) => {
-        const groupName = params.value && params.value.name ? params.value.name : '';
+        // group is an array of objects with name and id
+        const group = params.row.group
+        // console.log(group)
         return (
-          <Typography
-            sx={{
-              fontSize: "0.75rem",
-              fontWeight: "600",
-              color: "#111827",
-            }}
+          <Box
+          key={params.row._id}
+          sx = {{
+            display: "flex",
+            alignItems: "center",
+          }}
           >
-            {groupName}
-          </Typography>
-        );
+            {group.map((item, index) => {
+              return (
+                <Typography
+                key={item._id}
+                sx = {{
+                  fontSize: "0.75rem",
+                  fontWeight: "600",
+                  color: "#111827",
+                }}
+                >{item.name}{index !== group.length - 1 && ", "}</Typography>
+              )
+            })}
+          </Box>
+        )
       },
     },
     {
@@ -281,18 +296,19 @@ const Clients = () => {
       size="medium"
       startIcon={<AddRounded/>}
       sx = {{
-        backgroundColor: "#f55d00",
+        // backgroundColor: "#f55d00",
+        backgroundColor: "black",
         color: "white",
         borderRadius: "7px",
         textTransform: "none",
         fontSize: "0.65rem",
+        fontWeight : "600",
         padding: "0.61rem 0.9rem",
         boxShadow: "none",  
         '&:hover': {
-          boxShadow: "none",
-          // make it the same color but a bit darker
-          backgroundColor: "#eb5900",
-        },
+              backgroundColor: "#2b2b2b",
+              boxShadow: "none",
+            },
       }}
       >Ajouter un contact</Button>
       </FlexBetween>
@@ -444,6 +460,17 @@ const Clients = () => {
             fontWeight: "600",
             color : "#111827",
           }, 
+          // style the loading spinner
+          "& .MuiCircularProgress-root": {
+            color: "black",
+            // make the spinner smaller
+            width: "1.7rem !important",
+            height: "1.7rem !important",
+          },
+          // take off the focus color of the cells
+          "& .MuiDataGrid-cell:focus": {
+            outline: "none",
+          },
          }}
         />
         </Box>

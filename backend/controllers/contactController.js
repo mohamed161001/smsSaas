@@ -22,21 +22,7 @@ const getContacts = async (req, res) => {
         client: clientID,
         $or: [
           {
-            $or: [
-              {
-                fullName: { $regex: new RegExp(search, 'i') }, // Search by full name
-              },
-              {
-                $expr: {
-                  $regexMatch: {
-                    input: {
-                      $concat: ['$firstName', ' ', '$lastName'], // Concatenate firstName and lastName with a space
-                    },
-                    regex: new RegExp(search, 'i'),
-                  },
-                },
-              },
-            ],
+            firstName: { $regex: new RegExp(search, 'i') }, // Search by first name
           },
           { phoneNumber: { $regex: search, $options: 'i' } },
         ],
@@ -71,8 +57,10 @@ const getContact = async (req, res) => {
       if (!contact) {
         return res.status(404).json({ error: 'Contact inexistant' });
       }
-  
-      res.status(200).json(contact);
+      // return the name and the id of the group
+      const contactWithGroup = await Contact.findById(id).populate('group', 'name');
+      
+      res.status(200).json( contactWithGroup );
     } catch (error) {
       res.status(400).json({ error: error.message });
     }  
@@ -82,27 +70,24 @@ const getContact = async (req, res) => {
 const createContact = async (req, res) => {
     const {
       firstName,
-      lastName,
       phoneNumber,
       group,
       client,
     } = req.body;
+
+    // if the phoneNumber exists in the database, return an error
+    const exists = await Contact.exists({ phoneNumber });
+    if (exists) {
+      return res.status(400).json({ error: 'Ce numéro existe déjà' });
+    }
     try {
 
       const contact = await Contact.create({
         firstName,
-        lastName,
         phoneNumber,
         group,
         client,
       });
-
-     //push contact to group
-      // if (req.body.group) {
-      //   const group = await Group.findById(req.body.group);
-      //   group.contacts.push(contact._id);
-      //   await group.save();
-      // }
         
       res.status(200).json({ contact });
     } catch (error) {
@@ -133,18 +118,24 @@ const updateContact = async (req, res) => {
   const { id } = req.params;
   const {
     firstName,
-    lastName,
     phoneNumber,
     group,
     client,
   } = req.body;
-  // make sure that firstName, lastName, phoneNumber, group, client are not empty
+  // make sure that firstName, phoneNumber, group, client are not empty
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(404).json({ error: 'Contact inexistant' });
   }
-  if (!firstName || !lastName || !phoneNumber) {
+
+  if (!firstName || !phoneNumber || group.length === 0) {
     return res.status(400).json({ error: 'Veuillez remplir tous les champs' });
   }
+  // if the phoneNumber exists in the database besides the current contact, return an error
+  const exists = await Contact.exists({ phoneNumber, _id: { $ne: id } });
+  if (exists) {
+    return res.status(400).json({ error: 'Ce numéro existe déjà' });
+  }
+    
   try {
     const contact = await Contact.findById(id);
     if (!contact) {
@@ -152,7 +143,6 @@ const updateContact = async (req, res) => {
     }
     const updatedContact = await Contact.findByIdAndUpdate(id, {
       firstName,
-      lastName,
       phoneNumber,
       group,
       client,
@@ -165,10 +155,66 @@ const updateContact = async (req, res) => {
 };
 
 
+// create multiple contacts
+const createContacts = async (req, res) => {
+  const { client, contacts } = req.body;
+  try {
+    // only insert the contacts that their phoneNumber does not exist in the database
+    const contactsToInsert = await Promise.all(
+      contacts.map(async (contact) => {
+        const exists = await Contact.exists({ phoneNumber: contact.phoneNumber });
+        return exists ? null : { ...contact, client }; // Add the client field
+      })
+    );
+
+    // Filter out null values from the array (contacts that already exist)
+    const filteredContactsToInsert = contactsToInsert.filter(contact => contact !== null);
+
+    if (filteredContactsToInsert.length === 0) {
+      return res.status(200).json({ message: "0 contacts créés" });
+    }
+
+    const createdContacts = await Contact.insertMany(filteredContactsToInsert);
+
+    // return a message with the number of created contacts
+    res.status(200).json({ message: `${createdContacts.length} contacts créés` });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+//get group contacts
+const getGroupContacts = async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: 'Group inexistant' });
+  }
+
+  try {
+    const group = await Group.findById(id);
+
+    if (!group) {
+      return res.status(404).json({ error: 'Group inexistant' });
+    }
+
+      const contacts = await Contact.find({ group: { $in: [id] } });
+
+    res.status(200).json({ contacts });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+
+
+
 module.exports = {
     getContacts,
     getContact,
     createContact,
     deleteContact,
     updateContact,
-}
+    createContacts,
+    getGroupContacts,
+};
+

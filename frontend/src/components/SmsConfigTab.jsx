@@ -66,10 +66,10 @@ const CustomTextField = (props) => {
     const SmsConfigTab = () => {
       
       const { logout } = useLogout()
-      const dentist = useSelector((state) => state.reducer.dentist)
+      const user = useSelector((state) => state.reducer.user)
       const token = useSelector((state) => state.reducer.token)
 
-      const { data, isLoading, error } = useGetUserQuery({ id: dentist, token })
+      const { data, isLoading, error } = useGetUserQuery({ id: user?._id, token })
       const [updateUser, { isSuccess, isError, isLoading: isUpdating, error: updateError }] = useUpdateUserMutation()
 
 
@@ -92,7 +92,7 @@ const CustomTextField = (props) => {
             console.log('values',values)
             console.log('form data',formData)
             const response = await updateUser({ 
-                id: dentist,
+                id: user?._id,
                 user: formData,
                 token
             })

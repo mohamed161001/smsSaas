@@ -10,6 +10,7 @@ const userRoutes = require('./routes/userRoutes');
 const clientRoutes = require('./routes/clientRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const groupRoutes = require('./routes/groupRoutes');
+const campaignRoutes = require('./routes/campaignRoutes');
 const authMiddleware = require('./middlewares/auth');
 
 // express app
@@ -32,6 +33,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/client', clientRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/group', groupRoutes);
+app.use('/api/campaign', campaignRoutes);
 app.use(authMiddleware);
 app.use('/api/profile',profileRoutes);
 
