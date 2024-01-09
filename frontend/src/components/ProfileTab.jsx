@@ -84,12 +84,15 @@ const CustomTextField = (props) => {
     const user = useSelector((state) => state.reducer.user)
     const token = useSelector((state) => state.reducer.token)
 
-    const isDentist = user?.role === "dentist" ? true : false
+    const isUser = user?.role === "user" ? false : true
     // if the user is a dentist the phone number grid will be 3 else 4
-    const phoneGridSm = isDentist ? 5 : 8
+    const phoneGridSm = isUser ? 5 : 8
 
         
-    const { data, isLoading, error } = useGetUserQuery({ id: user?._id, token })
+    const { data, isLoading, error } = useGetUserQuery({ 
+      id: user?._id || "",
+      token
+    })
     const [updateUser, { isSuccess, isError, isLoading: isUpdating, error: updateError }] = useUpdateUserMutation()
     const [deleteUserImage, { 
       isSuccess: imageSuccess, 
@@ -119,11 +122,10 @@ const CustomTextField = (props) => {
     // formik setup //////////
     const formik = useFormik({
         initialValues: {
-            firstName: data?.user.firstName,
-            lastName: data?.user.lastName,
-            email: data?.user.email,
-            phoneNumber: data?.user.phoneNumber,
-            codeProf: data?.user.codeProf,
+            firstName: data?.user.firstName || "",
+            lastName: data?.user.lastName || "",
+            email: data?.user.email || "",
+            phoneNumber: data?.user.phoneNumber || "",
         },
         validationSchema: yup.object({
             firstName: yup.string().required('Le nom est requis'),
@@ -137,7 +139,6 @@ const CustomTextField = (props) => {
             formData.append('lastName', values.lastName)
             formData.append('email', values.email)
             formData.append('phoneNumber', values.phoneNumber)
-            formData.append('codeProf', values.codeProf)
             if (isImageChanged) {
               formData.append('Image', image)
             }
@@ -147,7 +148,6 @@ const CustomTextField = (props) => {
                     user: formData,
                     token
                 })
-                console.log(response)
                 handleClick()
                 setIsImageChanged(false)
             }
@@ -174,9 +174,10 @@ const CustomTextField = (props) => {
     const [image, setImage] = useState(null)
     const [imagePreview, setImagePreview] = useState(null)
     const [isImageChanged, setIsImageChanged] = useState(false)
+    const apiUrl = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
-      setImagePreview(`http://localhost:4000/${data?.user.image}`)
+      setImagePreview(`${apiUrl}/${data?.user.image}`);
     }, [data])
 
     const handleImageChange = (e) => {
@@ -220,7 +221,9 @@ const CustomTextField = (props) => {
 
   return (
     <Box >
-        <Typography sx = {{fontSize:"0.95rem", fontWeight:"700",}}>
+        <Typography
+        component="span"
+        sx = {{fontSize:"0.95rem", fontWeight:"700"}}>
             Mes informations
         </Typography>
         {
@@ -243,8 +246,8 @@ const CustomTextField = (props) => {
                 </Snackbar>
             )
         }
-        <form onSubmit={formik.handleSubmit} noValidate encType="multipart/form-data">
         <Box sx = {{backgroundColor:"#fff", borderRadius:"1.2rem", mt:"1rem"}}>
+        <form onSubmit={formik.handleSubmit} noValidate encType="multipart/form-data">
             { 
                 !isLoading ? (
                   <Badge 
@@ -255,7 +258,7 @@ const CustomTextField = (props) => {
                         <IconButton 
                         onClick ={handleBadgeClick}
                         sx = {{
-                          backgroundColor: "#FF6100",
+                          backgroundColor: "black",
                           color: "#fff",
                           boxShadow: "none",
                           margin: "1rem 0rem",
@@ -314,7 +317,7 @@ const CustomTextField = (props) => {
                                   onChange={handleImageChange}
                                 />
                               </ListItemIcon>
-                              <Typography variant="inherit" sx={{fontSize:'0.68rem',fontWeight:'600' , color : 'black'}}>Télécharger</Typography>
+                              <Typography  sx={{fontSize:'0.68rem',fontWeight:'600' , color : 'black'}}>Télécharger</Typography>
                             </MenuItem>
                           </label>
                           <MenuItem 
@@ -323,7 +326,7 @@ const CustomTextField = (props) => {
                             <ListItemIcon>
                               <DeleteOutlineRounded fontSize="small" sx={{fontSize:'1.1rem',color:'#c63232' }}/>
                             </ListItemIcon>
-                            <Typography variant="inherit" sx={{fontSize:'0.7rem',fontWeight:'500',color:'#c63232'}}>Supprimer</Typography>
+                            <Typography sx={{fontSize:'0.7rem',fontWeight:'500',color:'#c63232'}}>Supprimer</Typography>
                           </MenuItem>
                         </Menu>
                         </Box>
@@ -367,7 +370,7 @@ const CustomTextField = (props) => {
                             <CustomTextField
                                 fullWidth
                                 id = "firstName"
-                                 name="firstName"
+                                name="firstName"
                                 variant="outlined"
                                 placeholder="Nom du membre"
                                 size="small"
@@ -478,7 +481,7 @@ const CustomTextField = (props) => {
                     type='submit'
                     disabled={isUpdating}
                     sx={{
-                      backgroundColor: "#FF6100",
+                      backgroundColor: "black",
                       color: "#fff",
                       borderRadius: "7px",
                       boxShadow: "none",
@@ -536,8 +539,8 @@ const CustomTextField = (props) => {
           )
   }
     </Box>
-    </Box>
     </form>
+    </Box>
   </Box>
   )
 }

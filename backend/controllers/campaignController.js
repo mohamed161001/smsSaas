@@ -1,9 +1,9 @@
-const Campaign = require('../models/campaignModel');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const axios = require('axios');
 const User = require('../models/user');
 const Contact = require('../models/contactModel');
+const Campaign = require('../models/campaignModel');
 const Group = require('../models/groupModel');
 const bcrypt = require('bcrypt');
 
@@ -105,6 +105,8 @@ const sendSMS = async (user, recipientsData, message) => {
       const token = await genToken(user.smsToken);
       const devPhoneNumber = user.smsNumberDev;
       const smsResponses = [];
+      const received = [];
+      const failed = [];
   
       for (const recipientData of recipientsData) {
         const recipient = recipientData.phoneNumber;
@@ -136,6 +138,13 @@ const sendSMS = async (user, recipientsData, message) => {
   
           // Store the response for this SMS
           smsResponses.push(response.data);
+          
+          // // Store the response for this SMS
+          // if (response.data.outboundSMSMessageRequest.deliveryInfoList.deliveryInfo[0].deliveryStatus === "DeliveredToTerminal") {
+          //   received.push(recipient);
+          // } else {
+          //   failed.push(recipient);
+          // }
   
         } catch (error) {
           // if the error code is 403 return an error in French
@@ -174,18 +183,28 @@ const createCampaign = async (req,res)=> {
     }
 
    // ************************************************************************************************************
-    // // the campaign data has the id of the group , get the contacts of the group which will be the recipients of the campaign
-    // const groupId = campaignData.recipientsData.groupId;
-    // const recipientsData = await Contact.find({ group: { $in: [groupId] } });
+    // the campaign data has the id of the group , get the contacts of the group which will be the recipients of the campaign
+    const groupId = campaignData.recipientsData.groupId;
+    const recipientsData = await Contact.find({ group: { $in: [groupId] } });
 
-    // // if the group has no contacts return an error
-    // if (!recipientsData.length) {
-    //     return res.status(404).json({ error: 'Le groupe sélectionné ne contient aucun contact' });
-    // }
+    // if the group has no contacts return an error
+    if (!recipientsData.length) {
+        return res.status(404).json({ error: 'Le groupe sélectionné ne contient aucun contact' });
+    }
   // ************************************************************************************************************  
 
 
-        const smsResponses = await sendSMS(user,campaignData.recipientsData.recipientsData , campaignData.recipientsData.message);
+        const smsResponses = await sendSMS(user, recipientsData, campaignData.recipientsData.message);
+
+        // create the campaign in the database
+        const campaign = await Campaign.create(
+            {
+                name: campaignData.recipientsData.campaignName,
+                message: campaignData.recipientsData.message,
+                status: "Terminé",
+                client: campaignData.recipientsData.userId,
+            }
+        );
 
         res.status(200).json({ smsResponses });
 
@@ -195,10 +214,48 @@ const createCampaign = async (req,res)=> {
 }
 
 
+// get sms balance
+const getBalance = async (req, res) => {
+  try {
+    const { user } = req.query;
+
+    // check if the user exists
+    const userExists = await User.findById(user);
+
+    if (!userExists) {
+      return res.status(404).json({ error: 'Utilisateur introuvable' });
+    }
+
+    const token = await genToken(userExists.smsToken);
+
+
+    const url = `https://api.orange.com/sms/admin/v1/contracts`;
+
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
+
+    const balanceInfo = {
+      availableUnits: response.data[0], // Adjust this based on the actual response structure
+    };
+
+
+    res.status(200).json(balanceInfo);
+
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+
 
 
 module.exports = {
     getCampaigns,
     getCampaign,
     createCampaign,
+    getBalance
 }

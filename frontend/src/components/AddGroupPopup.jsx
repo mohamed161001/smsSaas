@@ -37,7 +37,7 @@ const CustomTextField = (props) => {
         fontSize: '0.74rem',
         color: '#000',
         fontWeight: '600',
-        padding: '0.65rem 0.4rem',
+        padding: '0.65rem 0.75rem',
         borderRadius: '20px',
         ...props.inputProps?.style,
       },
@@ -49,6 +49,10 @@ const CustomTextField = (props) => {
       '& .MuiOutlinedInput-root': {
         '& fieldset': {
           borderColor: '#F5F5F5',
+        },
+        '&.Mui-focused fieldset': {
+          // borderColor: 'black',
+          borderWidth: '1px',
         },
         borderRadius: '8px',
       },
@@ -127,7 +131,9 @@ const CustomTextField = (props) => {
     }}
     sx = {{
       '& .MuiDialog-paper': {
-        width: '30%',
+        // width: '30%',
+        maxWidth: '500px',
+        width: '350px',
         height: 'fit-content',
         borderRadius: '10px',
         boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
@@ -146,7 +152,7 @@ const CustomTextField = (props) => {
       </Typography>
     </DialogTitle>
     <DialogContent dividers> 
-      <form onSubmit={formik.handleSubmit} autoComplete="off" noValidate enctype="multipart/form-data">
+      <form onSubmit={formik.handleSubmit} autoComplete="off" noValidate encType="multipart/form-data">
           <Grid container spacing={2}>
                 <Grid item xs={12} sm={12}>
                   <InputLabel
@@ -201,8 +207,8 @@ const CustomTextField = (props) => {
             }}
           sx={{
             backgroundColor: "#fff",
-            color: "#f55d00",
-            borderColor: "#f55d00",
+            color: "black",
+            borderColor: "black",
             borderRadius: "7px",
             boxShadow: "none",
             fontSize: "0.65rem",
@@ -213,7 +219,8 @@ const CustomTextField = (props) => {
             '&:hover': {
               backgroundColor: "#fff",
               boxShadow: "none",
-              borderColor: "#eb5900",
+              borderColor: "#2b2b2b",
+              color: "#2b2b2b",
             },
           }}
         >
@@ -224,7 +231,7 @@ const CustomTextField = (props) => {
           disabled={isLoading}
           type='submit'
           sx={{
-            backgroundColor: "#f55d00",
+            backgroundColor: "black",
             color: "#fff",
             borderRadius: "7px",
             boxShadow: "none",
@@ -234,7 +241,7 @@ const CustomTextField = (props) => {
             textTransform: "none",
             margin: "1rem 0rem",
             '&:hover': {
-              backgroundColor: "#eb5900",
+              backgroundColor: "#2b2b2b",
               boxShadow: "none",
             },
           }}

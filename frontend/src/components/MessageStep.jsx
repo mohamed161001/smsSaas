@@ -68,11 +68,11 @@ const MessageStep = ({message,setMessage}) => {
 
 
     const shortcodes = [
-        {
-            label: "Nom",
-            value: "{{lastName}}",
-            preview: user.lastName
-        },
+        // {
+        //     label: "Nom",
+        //     value: "{{lastName}}",
+        //     preview: user.lastName
+        // },
         {
             label: "Prénom",
             value: "{{firstName}}",
@@ -176,6 +176,10 @@ const MessageStep = ({message,setMessage}) => {
                             ':hover': {
                                 border: '1px solid black',
                             },
+                            // when the textfield is focused make the border blue
+                            '&:focus-within': {
+                              border: '1px solid #1976d2',  // Change the border color to blue when focused
+                            },
                     }}
                     >
                     <TextField
@@ -209,8 +213,6 @@ const MessageStep = ({message,setMessage}) => {
                         '& .MuiFormHelperText-root': {
                         fontSize: '0.65rem',
                         fontWeight: '600',
-                        // marginLeft: '0.2rem',
-                        // marginTop: '0.1rem',
                         },
                         '& .MuiInputBase-input': {
                         fontSize: '0.74rem',
@@ -293,6 +295,7 @@ const MessageStep = ({message,setMessage}) => {
                 <img src={Phone} alt="phone" width="100%" />
                 <Typography
                   variant="body2"
+                  component="div"
                   sx={{
                     position: 'absolute',
                     top: '15%',  

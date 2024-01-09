@@ -174,7 +174,7 @@ const CustomTextField = (props) => {
             )
         }
         <Box sx = {{backgroundColor:"#fff", borderRadius:"1.2rem", mt:"1rem"}}>
-                    <form onSubmit={formik.handleSubmit} noValidate enctype="multipart/form-data">
+                    <form onSubmit={formik.handleSubmit} noValidate encType="multipart/form-data">
                 <Box sx = {{mt:"1.5rem"}}>
                     <Grid container spacing={2}>
                     <Grid item xs={12} sm={7}>
@@ -198,7 +198,7 @@ const CustomTextField = (props) => {
                     value={formik.values.password}
                     onChange={formik.handleChange}
                     error={formik.touched.password && Boolean(formik.errors.password)}
-                    helperText={formik.touched.password && formik.errors.password}
+                    helpertext={formik.touched.password && formik.errors.password}
                     endAdornment={
                         <InputAdornment position="end">
                             <IconButton
@@ -256,7 +256,7 @@ const CustomTextField = (props) => {
                     value={formik.values.confirmPassword}
                     onChange={formik.handleChange}
                     error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
-                    helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                    helpertext={formik.touched.confirmPassword && formik.errors.confirmPassword}
                     endAdornment={
                         <InputAdornment position="end">
                             <IconButton
@@ -312,7 +312,7 @@ const CustomTextField = (props) => {
           type='submit'
           disabled={isUpdating}
           sx={{
-            backgroundColor: "#FF6100",
+            backgroundColor: "black",
             color: "#fff",
             borderRadius: "7px",
             boxShadow: "none",

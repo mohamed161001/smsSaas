@@ -24,6 +24,7 @@ import {
     VisibilityOff,
     EmailRounded,
     CallRounded,
+    SearchRounded,
  } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { useFormik } from 'formik';
@@ -41,7 +42,7 @@ const CustomTextField = (props) => {
         fontSize: '0.74rem',
         color: '#000',
         fontWeight: '600',
-        padding: '0.65rem 0.4rem',
+        padding: '0.65rem 0.75rem',
         borderRadius: '20px',
         ...props.inputProps?.style,
       },
@@ -78,6 +79,27 @@ const CustomTextField = (props) => {
     />
     );
   };
+
+  const ListboxComponent = React.forwardRef((props, ref) => {
+    return (
+      <List {...props} ref={ref} sx={{
+        width: '100%',
+        maxWidth: 500,
+        bgcolor: 'background.paper',
+        maxHeight: '250px',
+        overflow: 'auto',
+        '&::-webkit-scrollbar': {
+          width: '0.3em',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: 'black',
+          borderRadius: '100px',
+        },
+      }}>
+        {props.children}
+      </List>
+    );
+  });
   
   
   const EditContactPopup = ({ open, setOpen,contactId}) => {
@@ -92,14 +114,14 @@ const CustomTextField = (props) => {
     
     const { data, isLoading , error , isFetching } = useGetClientQuery({
         token,
-        id: contactId
+        id: contactId || '',
     })
 
 
    
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [sort , setSort] = useState();
-    const { data : groupsData, isLoading : groupsIsLoading , error : groupsError } = useGetGroupsQuery({
+    const { data : groupsData, isLoading : groupsIsLoading , error : groupsError , isFetching : groupsIsFetching } = useGetGroupsQuery({
       page: paginationModel.page,
       pageSize: paginationModel.pageSize,
       sort: JSON.stringify(sort),
@@ -136,6 +158,7 @@ const CustomTextField = (props) => {
             // lastName,
             phoneNumber,
             group,
+            client,
         };
         console.log('payload',payload);
       const response = await updateClient({
@@ -214,7 +237,7 @@ const CustomTextField = (props) => {
         <Skeleton animation="wave" sx = {{ marginBottom: 1.2, height: "2rem" }} />
       </Box>
     ) : (
-      <form onSubmit={(e) => handleSubmit(e)} autoComplete="off" noValidate enctype="multipart/form-data">
+      <form onSubmit={(e) => handleSubmit(e)} autoComplete="off" noValidate encType="multipart/form-data">
           <Grid container spacing={2}>
                 <Grid item xs={12} sm={12}>
                   <InputLabel
@@ -231,7 +254,7 @@ const CustomTextField = (props) => {
                   fullWidth
                   id = "firstName"
                   name="firstName" 
-                  value = {firstName}
+                  value = {firstName || ''}
                   onChange = {(e) => setFirstName(e.target.value)}
                   variant="outlined"
                   placeholder="Nom du contact"
@@ -275,7 +298,7 @@ const CustomTextField = (props) => {
                     fullWidth
                     id="phoneNumber"
                     name="phoneNumber"
-                    value = {phoneNumber}
+                    value = {phoneNumber || ''}
                     onChange = {(e) => setPhoneNumber(e.target.value)}
                     variant="outlined"
                     size="small"
@@ -299,7 +322,7 @@ const CustomTextField = (props) => {
                         marginBottom: "0.5rem",
                     }}
                     >
-                        Groupe
+                        Groupes
                     </InputLabel>
                     <Autocomplete
                     multiple
@@ -309,7 +332,7 @@ const CustomTextField = (props) => {
                     // search from backend
                     onInputChange={(event, value) => setSearch(value)}
                     // add loading
-                    loading={isFetching || groupsIsLoading}
+                    loading={isFetching || groupsIsLoading || groupsIsFetching}
                     noOptionsText={
                       <span
                         style={{
@@ -343,9 +366,20 @@ const CustomTextField = (props) => {
                       <TextField
                         {...params}
                         variant="outlined"
-                        placeholder="Groupe du contact"
+                        placeholder="Groupes du contact"
                         size="small"
                         autoComplete="off"
+                        InputProps={{
+                          ...params.InputProps,
+                          startAdornment: (
+                            <>
+                              <InputAdornment position="start">
+                                <SearchRounded sx = {{color: "#000" , fontSize: "1rem"}}/>
+                              </InputAdornment>
+                              {params.InputProps.startAdornment}
+                            </>
+                          ),
+                        }}
                       />
                     )}
                     // do the loading effect
@@ -406,23 +440,7 @@ const CustomTextField = (props) => {
                         maxHeight: '150px',
                       },
                     }}
-                    ListboxComponent = {props => {
-                      return (
-                        <List {...props} sx={{
-                          width: '100%', maxWidth: 500, bgcolor: 'background.paper' , maxHeight: '250px', overflow: 'auto',
-                          // style for the scrollbar
-                          '&::-webkit-scrollbar': {
-                            width: '0.3em',
-                        },
-                        '&::-webkit-scrollbar-thumb': {
-                            backgroundColor: 'black',
-                            borderRadius: '100px',
-                        },
-                          }}>
-                          {props.children}
-                        </List>
-                      )
-                    }}
+                    ListboxComponent = {ListboxComponent}
                   />
                     </Grid>
                 <Grid item xs={12} sm={12}>
@@ -430,8 +448,10 @@ const CustomTextField = (props) => {
                         <Alert 
                         severity="error"
                         sx={{
-                            fontSize: "0.65rem",
+                            fontSize: "0.68rem",
                             fontWeight: "600",
+                            alignItems: "center",
+                            borderRadius: "8px",
                         }}
                         >{popupError}</Alert>
                     )}

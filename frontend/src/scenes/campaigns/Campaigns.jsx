@@ -26,6 +26,7 @@ import AddGroupPopup from '../../components/AddGroupPopup'
 import ImportListPopup from '../../components/ImportListPopup';
 import EditGroupPopup from '../../components/EditGroupPopup'
 import AllCampaignsTable from '../../components/AllCampaignsTable'
+import ScheduledCampaignsTable from '../../components/ScheduledCampaignsTable'
 
 
 
@@ -61,9 +62,8 @@ const Campaigns = () => {
         padding: "0.61rem 0.9rem",
         boxShadow: "none",  
         '&:hover': {
+          backgroundColor: "#2b2b2b",
           boxShadow: "none",
-          // make it the same color but a bit darker
-          backgroundColor: "#eb5900",
         },
       }}
       >Créer une campagne</Button>
@@ -79,7 +79,7 @@ const Campaigns = () => {
         <Box 
         sx={{ 
           borderBottom: 1,
-          borderColor: 'divider',
+          borderColor: 'rgb(0 0 0 / 6%)',
           marginBottom: "1rem",
           }}>
             <Tabs
@@ -111,7 +111,7 @@ const Campaigns = () => {
           }}
           />
           <Tab 
-          label="Términés"
+          label="Terminés"
           value="2"
           sx = {{
             '&.Mui-selected': {
@@ -132,7 +132,7 @@ const Campaigns = () => {
           </Box>
           {value === "1" && <AllCampaignsTable/>}
           {value === "2" && <AllCampaignsTable/>}
-          {value === "3" && <AllCampaignsTable/>}
+          {value === "3" && <ScheduledCampaignsTable/>}
       </Box>
       
     </Box>
