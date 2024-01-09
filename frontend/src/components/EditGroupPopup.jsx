@@ -15,6 +15,7 @@ import {
   IconButton,
   OutlinedInput,
   Alert,
+  Skeleton,
 } from '@mui/material';
 import { 
     Visibility,
@@ -50,6 +51,10 @@ const CustomTextField = (props) => {
         '& fieldset': {
           borderColor: '#F5F5F5',
         },
+        '&.Mui-focused fieldset': {
+          // borderColor: 'black',
+          borderWidth: '1px',
+        },
         borderRadius: '8px',
       },
       ...props.sx,
@@ -80,7 +85,7 @@ const CustomTextField = (props) => {
     // get the group to edit
     const { data, isFetching, error , isLoading } = useGetGroupQuery({
         token,
-        id: groupToEdit,
+        id: groupToEdit || '',
   });
 
   const [updateGroup, { isLoading: isUpdating, error: updateError }] = useUpdateGroupMutation();
@@ -158,7 +163,15 @@ const CustomTextField = (props) => {
       </Typography>
     </DialogTitle>
     <DialogContent dividers> 
-      <form onSubmit={(e) => handleSubmit(e)} autoComplete="off" noValidate enctype="multipart/form-data">
+    { isLoading || isFetching ? (
+      <Box sx={{ width: '100%' }}>
+        <Skeleton animation="wave" sx = {{ marginBottom: 1.2 , height: "2rem" }} />
+        <Skeleton animation="wave" sx = {{ marginBottom: 1.2, height: "2rem" }} />
+        <Skeleton animation="wave" sx = {{ marginBottom: 1.2 , height: "2rem"}} />
+        <Skeleton animation="wave" sx = {{ marginBottom: 1.2, height: "2rem" }} />
+      </Box>
+    ) : (
+      <form onSubmit={(e) => handleSubmit(e)} autoComplete="off" noValidate encType="multipart/form-data">
           <Grid container spacing={2}>
                 <Grid item xs={12} sm={12}>
                   <InputLabel
@@ -175,7 +188,7 @@ const CustomTextField = (props) => {
                   fullWidth
                   id = "name"
                    name="name" 
-                   value = {name}
+                   value = {name || ''}
                     onChange = {(e) => setName(e.target.value)}
                   variant="outlined"
                   placeholder="Nom du Group"
@@ -211,8 +224,8 @@ const CustomTextField = (props) => {
             }}
           sx={{
             backgroundColor: "#fff",
-            color: "#f55d00",
-            borderColor: "#f55d00",
+            color: "black",
+            borderColor: "black",
             borderRadius: "7px",
             boxShadow: "none",
             fontSize: "0.65rem",
@@ -223,7 +236,8 @@ const CustomTextField = (props) => {
             '&:hover': {
               backgroundColor: "#fff",
               boxShadow: "none",
-              borderColor: "#eb5900",
+              borderColor: "#2b2b2b",
+              color: "#2b2b2b",
             },
           }}
         >
@@ -234,7 +248,7 @@ const CustomTextField = (props) => {
           disabled={isLoading || isFetching || isUpdating}
           type='submit'
           sx={{
-            backgroundColor: "#f55d00",
+            backgroundColor: "black",
             color: "#fff",
             borderRadius: "7px",
             boxShadow: "none",
@@ -244,7 +258,7 @@ const CustomTextField = (props) => {
             textTransform: "none",
             margin: "1rem 0rem",
             '&:hover': {
-              backgroundColor: "#eb5900",
+              backgroundColor: "#2b2b2b",
               boxShadow: "none",
             },
           }}
@@ -253,6 +267,7 @@ const CustomTextField = (props) => {
         </Button>
       </Box>
       </form>
+      )}
     </DialogContent> 
     </Dialog>
   )

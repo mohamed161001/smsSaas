@@ -64,7 +64,7 @@ const Groups = () => {
     token
   });
 
-  console.log(data);
+
 
  //handling the delete
  const [deleteGroup, { isLoading: isDeleting, error: deleteError }] = useDeleteGroupMutation();
@@ -133,12 +133,14 @@ const Groups = () => {
     },
     {
       field: 'action',
-      headerName: 'Action',
+      headerName: 'Actions',
       flex: 0.6,
+      align: 'center',
+      headerAlign : 'center',
       renderCell: (params) => {
         return (
           <>
-              <IconButton >
+              {/* <IconButton >
                 <RemoveRedEyeRounded
                   sx = {{
                     // color: "#5271FF",
@@ -146,7 +148,7 @@ const Groups = () => {
                     fontSize: "1.1rem",
                   }}
                 />
-              </IconButton>
+              </IconButton> */}
               <IconButton
                 onClick = {() => handleEditClick(params.row._id)}
               >
@@ -255,9 +257,8 @@ const Groups = () => {
         padding: "0.61rem 0.9rem",
         boxShadow: "none",  
         '&:hover': {
+          backgroundColor: "#2b2b2b",
           boxShadow: "none",
-          // make it the same color but a bit darker
-          backgroundColor: "#eb5900",
         },
       }}
       >Ajouter un groupe</Button>

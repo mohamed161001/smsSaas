@@ -96,7 +96,6 @@ const CustomTextField = (props) => {
                 user: formData,
                 token
             })
-            console.log('response',response)
         }
         catch (error) {
             console.log(error)
@@ -122,7 +121,7 @@ const CustomTextField = (props) => {
             Vous pouvez configurer les SMS pour les rappels de rendez-vous.
         </Typography>
         <Box sx = {{backgroundColor:"#fff", borderRadius:"1.2rem", mt:"1rem"}}>
-                    <form onSubmit={formik.handleSubmit} noValidate enctype="multipart/form-data">
+                    <form onSubmit={formik.handleSubmit} noValidate encType="multipart/form-data">
                 <Box sx = {{mt:"1.5rem"}}>
                     <Grid container spacing={2}>
                     <Grid item xs={12} sm={8}>
@@ -202,7 +201,7 @@ const CustomTextField = (props) => {
           type='submit'
           disabled={isUpdating}
           sx={{
-            backgroundColor: "#FF6100",
+            backgroundColor: "black",
             color: "#fff",
             borderRadius: "7px",
             boxShadow: "none",

@@ -14,7 +14,6 @@ import {
   IconButton,
   InputBase,
   Chip,
-  Tooltip,
 } from '@mui/material'
 import {
   SearchRounded,
@@ -23,8 +22,7 @@ import {
   RemoveRedEyeRounded,
   DownloadRounded,
   AddRounded,
-  BarChartRounded,
-  ScheduleRounded,
+  Schedule,
  } from '@mui/icons-material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Link } from 'react-router-dom'
@@ -37,7 +35,7 @@ import { useGetCampaignsQuery } from '../slices/CampaignSlice'
 import ImportListPopup from '../components/ImportListPopup';
 import EditGroupPopup from '../components/EditGroupPopup'
 
-const AllCampaignsTable = () => {
+const ScheduledCampaignsTable = () => {
 
     const { logout } = useLogout()
 
@@ -59,14 +57,6 @@ const AllCampaignsTable = () => {
     const [groupToDelete, setGroupToDelete] = useState(null);
     const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   
-    // const { data, error, isLoading , isFetching } = useGetGroupsQuery({
-    //   page: paginationModel.page,
-    //   pageSize: paginationModel.pageSize,
-    //   sort: JSON.stringify(sort),
-    //   clientID: clientId,
-    //   search: search,
-    //   token
-    // });
 
     const { data, error, isLoading , isFetching  } = useGetCampaignsQuery({
       page: paginationModel.page,
@@ -77,15 +67,14 @@ const AllCampaignsTable = () => {
       token
     });
 
-
   
    //handling the delete
    const [deleteGroup, { isLoading: isDeleting, error: deleteError }] = useDeleteGroupMutation();
   
-  //  const handleDeleteClick = (id) => {
-  //     setGroupToDelete(id);
-  //    setShowConfirmDelete(true);
-  //  };
+   const handleDeleteClick = (id) => {
+      setGroupToDelete(id);
+     setShowConfirmDelete(true);
+   };
   
    const handleConfirmDialogClose = () => {
      setShowConfirmDelete(false);
@@ -113,10 +102,10 @@ const AllCampaignsTable = () => {
    const [openEdit,setOpenEdit] = useState(false);
    const [groupToEdit, setGroupToEdit] = useState(null);
   
-  //  const handleEditClick = (id) => {
-  //     setGroupToEdit(id);
-  //     setOpenEdit(true);
-  //   };
+   const handleEditClick = (id) => {
+      setGroupToEdit(id);
+      setOpenEdit(true);
+    };
   
   
   
@@ -134,6 +123,11 @@ const AllCampaignsTable = () => {
           return fullDate
         }
        },
+       {
+        field: 'scheduledTime',
+        headerName: 'Date d\'envoi',
+        flex: 1,
+       },
       { 
         field: 'name',
         headerName: 'Nom',
@@ -144,72 +138,15 @@ const AllCampaignsTable = () => {
         headerName: 'Délivrés',
         flex: 0.8
       },
-      { 
-        field: 'status',
-        headerName: 'Statut',
-        flex: 0.8,
-        renderCell: (params) => {
-          let color;
-          let backgroundColor;
-          switch (params.value) {
-            case 'Programmé':
-              color = '#e39f00';
-              backgroundColor = '#fff2ce';
-              break;
-            case 'Terminé':
-              color = "#10AF0D";
-              backgroundColor = "#cdffcf";
-              break;
-            case 'Annulée':
-              color = "#F95757";
-              backgroundColor = "#FFE6E6";
-              break;
-            default:
-              color = '#F95757';
-              backgroundColor = '#FFCACA';
-          }
-          return (
-            <Chip 
-            label={params.value}
-            size="small"
-            variant="outlined"
-            // add the icon if the status is Programmed
-            icon={params.value === "Programmé" ? <ScheduleRounded 
-            sx={{
-              color: '#e39f00',
-              fontSize: '0.5rem',
-            }}
-            /> : null}
-            sx={{
-              color: color,
-              backgroundColor: backgroundColor,
-              borderRadius: '5px',
-              border : '0px solid',
-              borderColor: color,
-              fontSize: '0.65rem',
-              fontWeight: '500',
-              padding: '0.87rem 0.7rem',
-              // style the icon
-              '& .MuiChip-icon': {
-                color: color,
-                fontSize: '0.88rem',
-              },
-            }}
-            />
-          )
-        }
-      },
       {
         field: 'action',
-        headerName: 'Actions',
+        headerName: 'Action',
         flex: 0.6,
         renderCell: (params) => {
           return (
             <>
-              { params.row.status === "Terminé" &&
-                <Tooltip title="Statistiques">
                 <IconButton >
-                  <BarChartRounded
+                  <RemoveRedEyeRounded
                     sx = {{
                       // color: "#5271FF",
                       color: "#6B7280",
@@ -217,8 +154,7 @@ const AllCampaignsTable = () => {
                     }}
                   />
                 </IconButton>
-              </Tooltip>}
-                {/* <IconButton
+                <IconButton
                   onClick = {() => handleEditClick(params.row._id)}
                 >
                   <EditRounded
@@ -227,8 +163,8 @@ const AllCampaignsTable = () => {
                       fontSize: "1.1rem",
                     }}
                   />
-                </IconButton> */}
-                {/* <IconButton
+                </IconButton>
+                <IconButton
                   onClick = {() => handleDeleteClick(params.row._id)}
                 >
                   <DeleteOutline
@@ -238,7 +174,7 @@ const AllCampaignsTable = () => {
                       fontSize: "1.1rem",
                     }}
                   />
-                </IconButton> */}
+                </IconButton>
               </>
           )
         }
@@ -433,4 +369,4 @@ const AllCampaignsTable = () => {
   )
 }
 
-export default AllCampaignsTable
+export default ScheduledCampaignsTable

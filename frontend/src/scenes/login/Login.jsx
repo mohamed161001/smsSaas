@@ -187,6 +187,7 @@ const Login = () => {
           </Grid>
           <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'flex-end', }}>
             <Typography
+             component="div"
               sx={{
                 fontSize: "0.75rem",
                 fontWeight: "500",
@@ -237,7 +238,8 @@ const Login = () => {
               >{error?.data?.error}</Alert>
             }
             <Box sx={{ mt: 3 , display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
-            <Typography variant="caption" 
+            <Typography 
+            variant="caption" 
               sx={{
               fontSize: "0.78rem",
               fontWeight: "500",

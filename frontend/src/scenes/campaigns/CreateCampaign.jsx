@@ -16,6 +16,7 @@ import {
 import {
     MoodRounded,
     AutoFixHighRounded ,
+    SendRounded,
 } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -23,6 +24,7 @@ import Phone from '../../assets/Phone.png'
 import FlexBetween from '../../components/FlexBetween';
 import MessageStep from '../../components/MessageStep';
 import TargetingStep from '../../components/TargetingStep';
+import CampaignSummary from '../../components/CampaignSummary';
 
 
 const CustomTextField = (props) => {
@@ -90,6 +92,24 @@ const CreateCampaign = () => {
 
     // message step
     const [message,setMessage] = useState('')
+    // enough credits or not
+    const [notEnoughCredits, setNotEnoughCredits] = useState(false)
+
+    const isNextDisabled = () => {
+      switch (activeStep) {
+          case 0:
+              return !campaignName || !campaignGroup || campaignGroup.length === 0;
+          case 1:
+              return !message || message.length === 0;
+          // case 2:
+          //     return notEnoughCredits;
+          default:
+              return false;
+      }
+  };
+
+
+  
 
 
   return (
@@ -114,11 +134,18 @@ const CreateCampaign = () => {
         <Stepper activeStep={activeStep} 
         sx={{
             mt:"1.5rem",
-            // style the label
             '& .MuiStepLabel-label': {
-                fontSize: '0.75rem',
+              fontSize: '0.75rem',
+              fontWeight: '600',
+          },
+            // on small screens make the stepper label smaller
+            '@media (max-width:400px)': {
+              '& .MuiStepLabel-label': {
+                fontSize: '0.6rem',
                 fontWeight: '600',
+              },
             },
+
             // Style the active label
             '& .MuiStepLabel-label.Mui-active': {
                 fontWeight: '600',
@@ -142,7 +169,7 @@ const CreateCampaign = () => {
             },
             // style the connector line
             '& .MuiStepConnector-line': {
-                borderColor: '#dddddd',
+                borderColor: '#dddddd8c',
             },
         }}>
             {steps.map((label, index) => {
@@ -161,38 +188,21 @@ const CreateCampaign = () => {
             }
             )}
         </Stepper>
-        <Box sx={{mt:"1.5rem"}}>
-            {activeStep === steps.length ? (
-                <Box>
-                    <Typography sx={{mt:"1.5rem"}}>Toutes les étapes sont terminées</Typography>
-                    <Box sx={{mt:"1.5rem"}}>
-                        <Button onClick={
-                            () => setActiveStep(0)
-                        }>
-                            Réinitialiser
-                        </Button>
-                    </Box>
-                </Box>
-            ) : (
-                
-                <Box>
-                {activeStep === steps.length ? (
-    <Box>
-      <Typography sx={{ mt: "1.5rem" }}>Toutes les étapes sont terminées</Typography>
-      <Box sx={{ mt: "1.5rem" }}>
-        <Button onClick={() => setActiveStep(0)}>Réinitialiser</Button>
-      </Box>
-    </Box>
-  ) : (
-    <Box>
+    <Box sx={{mt:"1.5rem"}}>
       {activeStep === 0 && (
         <TargetingStep campaignName={campaignName} setCampaignName={setCampaignName} campaignGroup={campaignGroup} setCampaignGroup={setCampaignGroup}/>
       )}
       {activeStep === 1 && (
         <MessageStep message={message} setMessage={setMessage} />
       )}
-    </Box>
-  )}           
+      {activeStep === 2 && (
+        <CampaignSummary campaignName={campaignName} campaignGroup={campaignGroup} message={message} setNotEnoughCredits={setNotEnoughCredits} notEnoughCredits={notEnoughCredits} />
+      )}
+      {activeStep === steps.length  && (
+         <TargetingStep campaignName={campaignName} setCampaignName={setCampaignName} campaignGroup={campaignGroup} setCampaignGroup={setCampaignGroup}/>
+      )}
+    </Box>  
+    { activeStep !== steps.length &&
                     <Box sx={{mt:"1.5rem"}}>
                         <Button
                             disabled={activeStep === 0}
@@ -220,6 +230,9 @@ const CreateCampaign = () => {
                         <Button 
                         variant="contained"
                         onClick={handleNext}
+                        disabled={isNextDisabled()}
+                        // add an icon to the button if it's the last step
+                        startIcon={activeStep === steps.length - 1 ? <SendRounded/> : null}
                         sx={{
                             backgroundColor: "black",
                             color: "#fff",
@@ -234,15 +247,16 @@ const CreateCampaign = () => {
                               backgroundColor: "#2b2b2b",
                               boxShadow: "none",
                             },
+                              '& .MuiSvgIcon-root': {
+                                fontSize: '0.95rem',
+                              },
                           }}
                         >
-                            {activeStep === steps.length - 1 ? 'Terminer' : 'Suivant'}
+                            {activeStep === steps.length - 1 ? 'Envoyer' : 'Suivant'}
                         </Button>
                         </Box>
+                }
                 </Box>
-            )}
-        </Box>
-        </Box>
     </Box>
   )
 }

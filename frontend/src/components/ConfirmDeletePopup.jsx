@@ -30,11 +30,12 @@ const ConfirmDelete = ({ open, onClose, onConfirm,isLoading }) => {
             }} />
         </Box>
 
-        <DialogTitle textAlign="center">
-            <Typography variant="h5" sx={{ fontWeight: "700" , fontSize: "1.1rem",color:'black' }}>
+            <DialogTitle textAlign="center">
+              <Typography sx={{ fontWeight: "700", fontSize: "1.1rem", color: 'black' }}>
                 Confirmation de suppression
-            </Typography>
-        </DialogTitle>
+              </Typography>
+            </DialogTitle>
+
 
         <DialogContent>
             <Typography variant="body1" 

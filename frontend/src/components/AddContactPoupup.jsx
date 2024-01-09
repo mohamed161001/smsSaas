@@ -23,6 +23,7 @@ import {
     VisibilityOff,
     EmailRounded,
     CallRounded,
+    SearchRounded,
  } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { useFormik } from 'formik';
@@ -40,7 +41,7 @@ const CustomTextField = (props) => {
         fontSize: '0.74rem',
         color: '#000',
         fontWeight: '600',
-        padding: '0.65rem 0.4rem',
+        padding: '0.65rem 0.75rem',
         borderRadius: '20px',
         ...props.inputProps?.style,
       },
@@ -77,6 +78,27 @@ const CustomTextField = (props) => {
     />
     );
   };
+
+  const ListboxComponent = React.forwardRef((props, ref) => {
+    return (
+      <List {...props} ref={ref} sx={{
+        width: '100%',
+        maxWidth: 500,
+        bgcolor: 'background.paper',
+        maxHeight: '250px',
+        overflow: 'auto',
+        '&::-webkit-scrollbar': {
+          width: '0.3em',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: 'black',
+          borderRadius: '100px',
+        },
+      }}>
+        {props.children}
+      </List>
+    );
+  });
   
   
   const AddContactPopup = ({ open, setOpen }) => {
@@ -98,7 +120,6 @@ const CustomTextField = (props) => {
       token
     });
 
-    console.log(data)
 
 
     const [addClient, { isLoading, error }] = useAddClientMutation();
@@ -116,7 +137,7 @@ const CustomTextField = (props) => {
             firstName: '',
             // lastName: '',
             phoneNumber: '',
-            group : [],
+            group : [] || '',
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {
@@ -128,6 +149,11 @@ const CustomTextField = (props) => {
             }
             if (values.group) {
               data.group = values.group;
+          }
+          // if the length of the group is 0 return an error saying that the group is required and set the popup error
+          if (values.group.length === 0) {
+              setPopupError('Le groupe est obligatoire');
+              return;
           }
             try {
                 const response = await addClient({
@@ -145,7 +171,7 @@ const CustomTextField = (props) => {
             } catch (error) {
                 console.log(error);
                 // set the popup error
-                setPopupError(error.message);
+                setPopupError(response.error.data.error);
             }
         },
   });
@@ -174,7 +200,9 @@ const CustomTextField = (props) => {
     }}
     sx = {{
       '& .MuiDialog-paper': {
-        width: '30%',
+        // width: '30%',
+        maxWidth: '500px',
+        width: '350px',
         height: 'fit-content',
         borderRadius: '10px',
         boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
@@ -193,7 +221,7 @@ const CustomTextField = (props) => {
       </Typography>
     </DialogTitle>
     <DialogContent dividers> 
-      <form onSubmit={formik.handleSubmit} autoComplete="off" noValidate enctype="multipart/form-data">
+      <form onSubmit={formik.handleSubmit} autoComplete="off" noValidate encType="multipart/form-data">
           <Grid container spacing={2}>
                 <Grid item xs={12} sm={12}>
                   <InputLabel
@@ -288,7 +316,7 @@ const CustomTextField = (props) => {
                         marginBottom: "0.5rem",
                     }}
                     >
-                        Groupe
+                        Groupes
                     </InputLabel>
                     <Autocomplete
                     multiple
@@ -331,16 +359,27 @@ const CustomTextField = (props) => {
                       <TextField
                         {...params}
                         variant="outlined"
-                        placeholder="Groupe du contact"
+                        placeholder="Groupes du contact"
                         size="small"
                         autoComplete="off"
+                        InputProps={{
+                          ...params.InputProps,
+                          startAdornment: (
+                            <>
+                              <InputAdornment position="start">
+                                <SearchRounded sx = {{color: "#000" , fontSize: "1rem"}}/>
+                              </InputAdornment>
+                              {params.InputProps.startAdornment}
+                            </>
+                          ),
+                        }}
                       />
                     )}
                     // do the loading effect
                     renderOption={(props, option) => {
                       return (
                           <MenuItem
-                          {...props} key={data?._id} value={data?._id}
+                          {...props} key={option?._id} value={option?._id}
                             sx={{
                               fontSize: '0.75rem',
                               fontWeight: '600',
@@ -384,42 +423,31 @@ const CustomTextField = (props) => {
                         borderColor: '#1976d2',
                         borderWidth: '1px',
                     },
+                  //   '& .MuiAutocomplete-endAdornment': {
+                  //     display: 'none',
+                  // },
                     }}
                     ListboxProps={{
                       style: {
                         maxHeight: '150px',
                       },
                     }}
-                    ListboxComponent = {props => {
-                      return (
-                        <List {...props} sx={{
-                          width: '100%', maxWidth: 500, bgcolor: 'background.paper' , maxHeight: '250px', overflow: 'auto',
-                          // style for the scrollbar
-                          '&::-webkit-scrollbar': {
-                            width: '0.3em',
-                        },
-                        '&::-webkit-scrollbar-thumb': {
-                            backgroundColor: 'black',
-                            borderRadius: '100px',
-                        },
-                          }}>
-                          {props.children}
-                        </List>
-                      )
-                    }}
+                    ListboxComponent = {ListboxComponent}
                   />
                     </Grid>
                 <Grid item xs={12} sm={12}>
                     {popupError && (
                         <Alert 
                         severity="error"
+                        // choose the small 
+
                         sx={{
-                            fontSize: "0.67rem",
+                            fontSize: "0.68rem",
                             fontWeight: "600",
                             // make the icon and the text align vertically
                             display: "flex",
                             alignItems: "center",
-
+                            borderRadius: "8px",
                         }}
                         >{popupError}</Alert>
                     )}

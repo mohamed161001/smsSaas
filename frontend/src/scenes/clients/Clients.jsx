@@ -13,6 +13,7 @@ import {
   Avatar,
   IconButton,
   InputBase,
+  Tooltip,
 } from '@mui/material'
 import {
   SearchRounded,
@@ -65,7 +66,6 @@ const Clients = () => {
     token
   });
 
-  console.log(data)
 
 
   //handling the delete
@@ -93,7 +93,6 @@ const Clients = () => {
         !isDeleting && handleConfirmDialogClose();
       }
     } catch (err) {
-      console.log(err);
       handleConfirmDialogClose();
     }
   }
@@ -153,18 +152,22 @@ const Clients = () => {
     },
     {
       field: 'group',
-      headerName: 'Groupe',
+      headerName: 'Groupes',
       flex: 0.7,
       renderCell: (params) => {
         // group is an array of objects with name and id
         const group = params.row.group
         // console.log(group)
         return (
+          <Tooltip title={group.map((item) => item.name).join(", ")} arrow>
           <Box
           key={params.row._id}
           sx = {{
             display: "flex",
             alignItems: "center",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           }}
           >
             {group.map((item, index) => {
@@ -180,17 +183,20 @@ const Clients = () => {
               )
             })}
           </Box>
+          </Tooltip>
         )
       },
     },
     {
       field: 'action',
-      headerName: 'Action',
+      headerName: 'Actions',
       flex: 0.6,
+      align: 'center',
+      headerAlign : 'center',
       renderCell: (params) => {
         return (
           <>
-              <IconButton >
+              {/* <IconButton >
                 <RemoveRedEyeRounded
                   sx = {{
                     // color: "#5271FF",
@@ -198,7 +204,7 @@ const Clients = () => {
                     fontSize: "1.1rem",
                   }}
                 />
-              </IconButton>
+              </IconButton> */}
               <IconButton
                 onClick = {() => handleEditClick(params.row._id)}
               >
@@ -268,11 +274,9 @@ const Clients = () => {
   useEffect(() => {
     if (error && error.status === 401) {
       logout()
-      console.log("unauthorized");
     }
     if (deleteError && deleteError.status === 401) {
       logout()
-      console.log("unauthorized");
     }
   }, [error, deleteError]);
 
