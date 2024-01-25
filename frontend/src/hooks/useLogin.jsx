@@ -1,7 +1,6 @@
 import { setLogin } from "../state";
 import { useLoginUserMutation } from "../state/api";
 import { useDispatch } from "react-redux";
-// import Cookies from 'js-cookie';
 
 export const useLogin = () => {
     const dispatch = useDispatch();

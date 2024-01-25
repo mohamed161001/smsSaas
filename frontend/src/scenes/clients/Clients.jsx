@@ -14,6 +14,8 @@ import {
   IconButton,
   InputBase,
   Tooltip,
+  Alert,
+  Snackbar
 } from '@mui/material'
 import {
   SearchRounded,
@@ -101,9 +103,19 @@ const Clients = () => {
   const [openEdit, setOpenEdit] = useState(false);
   const [contactToEdit, setContactToEdit] = useState(null);
 
-  const handleEditClick = (id) => {
-    setContactToEdit(id);
+  const handleEditClick = (contact) => {
+    setContactToEdit(contact);
     setOpenEdit(true);
+  };
+
+  // handling the snackbar message
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [message,setMessage] = useState('')
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
 
@@ -126,24 +138,6 @@ const Clients = () => {
       field: 'firstName',
       headerName: 'Nom Complet',
       flex: 1,
-      // renderCell: (params) => {
-      //   return (
-      //     <Box
-      //     sx = {{
-      //       display: "flex",
-      //       alignItems: "center",
-      //     }}
-      //     >
-      //       <Typography
-      //       sx = {{
-      //         fontSize: "0.75rem",
-      //         fontWeight: "600",
-      //         color: "#111827",
-      //       }}
-      //       >{params.row.firstName} {params.row.lastName}</Typography>
-      //     </Box>
-      //   )
-      // }
     },
     { 
       field: 'phoneNumber', 
@@ -206,7 +200,7 @@ const Clients = () => {
                 />
               </IconButton> */}
               <IconButton
-                onClick = {() => handleEditClick(params.row._id)}
+                onClick = {() => handleEditClick(params.row)}
               >
                 <EditRounded
                   sx = {{
@@ -285,15 +279,30 @@ const Clients = () => {
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
       <Header title="Contacts" subtitle="Liste des contacts"/>
+                <Snackbar 
+                open={snackbarOpen}
+                autoHideDuration={4000}
+                onClose={handleSnackbarClose}
+                // top right 
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                sx ={{
+                    // put it a little bit down
+                    marginTop:"2.5rem",
+                }}
+                >
+                    <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' , fontSize:"0.7rem" , fontWeight:"600", borderRadius:"0.5rem",backgroundColor:"rgb(193 255 193)"}}>
+                        {message}
+                    </Alert>
+                </Snackbar>
       <ConfirmDelete
         open={showConfirmDelete}
         onClose={handleConfirmDialogClose}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
       />
-      <ImportListPopup open={openImport} setOpen={setOpenImport}/>
+      <ImportListPopup open={openImport} setOpen={setOpenImport} setSnackbarOpen={setSnackbarOpen} setMessage={setMessage} />
       <AddContactPopup  open={open} setOpen={setOpen}/>
-      <EditContactPopup open={openEdit} setOpen={setOpenEdit} contactId={contactToEdit}/>
+      <EditContactPopup open={openEdit} setOpen={setOpenEdit} contact={contactToEdit}/>
       <Button 
       onClick={() => setOpen(true)}
       variant="contained"

@@ -71,7 +71,12 @@ const Login = () => {
 
   return (
     <Grid container component="main" sx={{ height: '100vh' }}>
-      <Grid item xs={12} sm={8} md={6} component={Paper} elevation={6} square>
+      <Grid item xs={12} sm={8} md={6} component={Paper} elevation={6} square 
+      sx={{
+        flexGrow: { xs: 1, sm: 1, md: 0 },
+        maxWidth: { xs: '100%', sm: '100%', md: '50%' },
+      }}
+      >
         <Box
           sx={{
               display: 'flex',
@@ -80,7 +85,7 @@ const Login = () => {
               mt : 3,
           }}
         >
-          <img src={logo} alt="logo" style={{ width: '19%', height: 'auto' }} />
+          <img src={logo} alt="logo" style={{ height: 'auto',width: '7.5rem', }} />
         </Box>
         <Box
           sx={{
@@ -93,7 +98,9 @@ const Login = () => {
         >
           <form onSubmit={formik.handleSubmit} noValidate autoComplete="off">
           <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid item xs={12} sm={12}>
+          <Grid 
+          item xs={12} sm={12}
+          >
           <Typography component="h1" variant="h5" sx={{ fontSize: "1.6rem", fontWeight: "700", color: "#000", }}>
               Bienvenue,
           </Typography>
@@ -210,7 +217,7 @@ const Login = () => {
               fullWidth
               variant="contained"
               sx={{
-                backgroundColor: "#f55d00",
+                backgroundColor: "black",
                 color: "#fff",
                 borderRadius: "7px",
                 boxShadow: "none",
@@ -219,8 +226,8 @@ const Login = () => {
                 padding: "0.75rem 1.7rem",
                 textTransform: "none",
                 '&:hover': {
+                  backgroundColor: "#2b2b2b",
                   boxShadow: "none",
-                  backgroundColor: "#eb5900",
                 },
               }}
             >
@@ -232,10 +239,12 @@ const Login = () => {
               error && <Alert 
               severity="error"
               sx={{
-                  mt: 2,
-                  width: "100%",
+                mt: 2,
+                width: "100%",
+                fontSize: "0.75rem",
+                fontWeight: "500",
               }}
-              >{error?.data?.error}</Alert>
+              >{error?.data?.error?.split("Error: ")[1]}</Alert>
             }
             <Box sx={{ mt: 3 , display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
             <Typography 
@@ -256,6 +265,7 @@ const Login = () => {
               Vous n'avez pas de compte ?
               <a
                 onClick={() => {navigate("/register", { replace: true });}}
+                style={{ cursor: 'pointer' }}
               >
                 {" "}S'inscrire
               </a>
@@ -266,17 +276,15 @@ const Login = () => {
       </Grid>
       <Grid
         item
-        xs={false}
         sm={4}
         md={6}
         sx={{
-          // backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
           backgroundRepeat: 'no-repeat',
-          // backgroundColor: (t) =>
-          //   t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           background: '#f55d00',
+          // make it dissapear on small screens
+          display: { xs: 'none', sm: 'none', md: 'block' },
         }}
       >
         <Box
@@ -304,22 +312,6 @@ const Login = () => {
               <br />
               été aussi simple !
           </Typography>
-          {/* <Typography
-          sx={{
-              fontSize: "0.7rem",
-              fontWeight: "500",
-              color: "#fff",
-              marginTop: "0.3rem",
-              marginBottom: "0.5rem",
-              textAlign: "left",
-              alignSelf: "flex-start",
-              mb: 5,
-              }}
-          >
-            Gérez votre cabinet en toute simplicité avec 
-            <br />
-          </Typography> */}
-          {/* <img src="" alt="login" style={{ width: '100%', height: 'auto' }} /> */}
         </Box>
 
         </Grid>

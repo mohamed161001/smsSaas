@@ -25,6 +25,17 @@ export const clientSlice = api.injectEndpoints({
             }),
             invalidatesTags: ['Client'],
         }),
+        addClients : build.mutation({
+            query: ({clients,token}) => ({
+                url: "/api/contact/createContacts",
+                method: "POST",
+                body: clients,
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+            }),
+            invalidatesTags: ['Client'],
+        }),
         deleteClient: build.mutation({
             query: ({id,token}) => ({
                 url: `/api/contact/${id}`,
@@ -65,4 +76,5 @@ export const {
     useDeleteClientMutation,
     useGetClientQuery,
     useUpdateClientMutation,
+    useAddClientsMutation,
 } = clientSlice;

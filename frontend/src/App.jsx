@@ -10,6 +10,7 @@ import Settings from './scenes/settings/Settings';
 import ForgetPassword from './scenes/forget-password/ForgetPassword';
 import Campaigns from './scenes/campaigns/Campaigns';
 import CreateCampaign from './scenes/campaigns/CreateCampaign';
+import ResetPassword from './scenes/reset-password/ResetPassword';
 import { useSelector } from 'react-redux';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/login" element={!isAuth ? <Login /> : <Navigate to="/dashboard" />} />
           <Route path="/register" element={!isAuth ? <Register /> : <Navigate to="/dashboard" />} />
           <Route path="/forget_pwd" element={!isAuth ? <ForgetPassword /> : <Navigate to="/dashboard" />} />
+          <Route path="/reset-password/:id/:token" element={!isAuth ? <ResetPassword /> : <Navigate to="/dashboard" />} />
           <Route element={<Layout/>}>
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<Dashboard />} />

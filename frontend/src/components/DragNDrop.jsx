@@ -16,7 +16,7 @@ const DropzoneContainer = styled(Box)({
   cursor: 'pointer',
   transition: 'border 0.3s ease-in-out',
   '&:hover': {
-    border: '2px dashed #6B7280',
+    border: '2px dashed black',
   },
 });
 
@@ -43,12 +43,11 @@ function DragNDrop({ setFile }) {
     isDragReject,
   } = useDropzone({
     onDrop,
-    accept: {
-      // Only accept image files
-      'image/*': ['.jpg', '.jpeg', '.png']
-    },
+    // accept: {
+    //   // Only accept image files
+    //   'image/*': ['.jpg', '.jpeg', '.png']
+    // },
     multiple: false, // Disable multiple file upload
-
   });
 
   return (
@@ -67,10 +66,10 @@ function DragNDrop({ setFile }) {
       >
         <input {...getInputProps()} />
         <Icon />
-        <Typography variant="body1" sx={{ fontWeight: '500', fontSize: '0.67rem' }}>
+        <Typography variant="body1" sx={{ fontWeight: '600', fontSize: '0.65rem' }}>
           {isDragActive
             ? isDragAccept
-              ? "Drop l'image ici"
+              ? "Glisser le fichier ici"
               : "Ce type d'image n'est pas supporté"
             : 'Glissez ou cliquez pour sélectionner un fichier'}
         </Typography>

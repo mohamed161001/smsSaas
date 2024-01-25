@@ -12,6 +12,7 @@ import {
     Avatar,
     Chip,
     IconButton,
+    Popover,
 } from '@mui/material';
 import {
     MoodRounded,
@@ -60,19 +61,105 @@ const CustomTextField = (props) => {
       );
     };
 
+    const EmojiPicker = ({ onSelectEmoji }) => {
+
+      const emojiList = [
+        '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘',
+        '😗', '😚', '😙', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐',
+        '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮',
+        '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐', '😕', '😟', '🙁', '☹️', '😮', '😯',
+        '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😓', '😩', '😫',
+        '🥱', '😤', '😡', '😠', '🤬', '😈', '👿', '💀', '☠️', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖',
+        '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '🙈', '🙉', '🙊', '💌', '💘', '💝', '💖', '💗',
+        '💓', '💞', '💕', '💟', '❣️', '💔', '❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💋', '💯',
+        '💢', '💥', '💫', '💦', '💨', '💤', '👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤏', '✌️', '🤞', '🤟', '🤘',
+        '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌', '👐', '🤲',
+        '🤝', '🙏', '✍️', '💅', '🤳', '💪', '🦾', '🦿', '🦵', '🦶', '🚀', '🔥', '🎁', '💥', '🎉', '✨', '👀',
+        '👁️', '👅', '👄'
+      ];
+    
+      return (
+        <Box sx={{ 
+          display: 'flex',
+          flexWrap: 'wrap',
+          width : "170px",
+          height : "100px",
+          overflowY : "scroll",
+          margin : "0.5rem",
+          // customize the scrollbar
+          '&::-webkit-scrollbar': {
+            width: '0.32em',
+          },
+          '&::-webkit-scrollbar-track': {
+            boxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
+            webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            borderRadius: '50px',
+          },
+
+          }}>
+          {emojiList.map((emoji, index) => (
+            <Chip
+              key={index}
+              label={emoji}
+              onClick={() => onSelectEmoji(emoji)}
+              sx={{
+                cursor: 'pointer',
+                fontSize: '0.75rem',
+                backgroundColor: 'transparent',
+                borderRadius: '50%',
+              }}
+            />
+          ))}
+        </Box>
+      );
+    };
+    
+
 const MessageStep = ({message,setMessage}) => {
 
     const user = useSelector((state) => state.reducer.user)
     const textfieldRef = useRef(null);
 
+    const [emojiPickerAnchor, setEmojiPickerAnchor] = useState(null);
+
+    
+    const handleOpenEmojiPicker = (event) => {
+      setEmojiPickerAnchor(event.currentTarget);
+      if (textfieldRef.current) {
+        textfieldRef.current.focus();
+      }
+    };
+  
+    const handleCloseEmojiPicker = () => {
+      setEmojiPickerAnchor(null);
+    };
+  
+    const handleSelectEmoji = (selectedEmoji) => {
+      if (textfieldRef.current) {
+        const textarea = textfieldRef.current;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+  
+        const newMessage =
+          message.substring(0, start) + selectedEmoji + message.substring(end);
+  
+        setMessage(newMessage);
+  
+        // Move the cursor to the end of the inserted emoji
+        const newPosition = start + selectedEmoji.length;
+        textarea.setSelectionRange(newPosition, newPosition);
+        textarea.focus();
+      }
+  
+      handleCloseEmojiPicker();
+    };
+
 
 
     const shortcodes = [
-        // {
-        //     label: "Nom",
-        //     value: "{{lastName}}",
-        //     preview: user.lastName
-        // },
         {
             label: "Prénom",
             value: "{{firstName}}",
@@ -80,15 +167,26 @@ const MessageStep = ({message,setMessage}) => {
         },
         {
             label: "Téléphone",
-            value: "{{phoneNumber}}"
+            value: "{{phoneNumber}}",
+            preview: user.phoneNumber
         },
     ]
 
     const handleShortcode = (shortcode) => {
-      setMessage((prevMessage) => prevMessage + shortcode);
-      // Use the ref to focus on the text field
       if (textfieldRef.current) {
-        textfieldRef.current.focus();
+        const textarea = textfieldRef.current;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+  
+        const newMessage =
+          message.substring(0, start) + shortcode + message.substring(end);
+  
+        setMessage(newMessage);
+  
+        // Move the cursor to the end of the inserted shortcode
+        const newPosition = start + shortcode.length;
+        textarea.setSelectionRange(newPosition, newPosition);
+        textarea.focus();
       }
     };
 
@@ -229,20 +327,22 @@ const MessageStep = ({message,setMessage}) => {
                         fontWeight: "600",
                         color: "#000",
                         textAlign: "left",
-                        marginLeft: "0.2rem",
+                        marginLeft: "0.4rem",
                     }}
                     >
                     {message.length}/160
                     </Typography>
                     <Box>
                     <IconButton
+                    onClick={handleOpenEmojiPicker}
                     sx={{
                         backgroundColor: "#f2f2f2",
-                        borderRadius: "8px",
-                        padding: "0.2rem",
+                        // borderRadius: "8px",
+                        padding: "0.25rem",
                         margin: "0.2rem 0.2rem",
                         '&:hover': {
-                            backgroundColor: "#f2f2f2",
+                            // make the background a bit grey 
+                            backgroundColor: "#dcdcdc",
                             boxShadow: "none",
                         },
                     }}
@@ -250,11 +350,12 @@ const MessageStep = ({message,setMessage}) => {
                     <MoodRounded
                     sx={{
                         fontSize: "1.1rem",
-                        color: "#FF6100",
+                        // if the popover is open change the color to blue
+                        color: emojiPickerAnchor ? '#FF6100' : '#707070',
                     }}
                     />
                     </IconButton>
-                    <IconButton
+                    {/* <IconButton
                     sx={{
                         backgroundColor: "#f2f2f2",
                         borderRadius: "8px",
@@ -272,7 +373,28 @@ const MessageStep = ({message,setMessage}) => {
                         color: "#FF6100",
                     }}
                     />
-                    </IconButton>
+                    </IconButton> */}
+                    <Popover
+                      open={Boolean(emojiPickerAnchor)}
+                      anchorEl={emojiPickerAnchor}
+                      onClose={handleCloseEmojiPicker}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                      }}
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                      }}
+                      // make the boxshadow less intense
+                      PaperProps={{
+                        sx: {
+                          boxShadow: '0px 2px 5px 2px rgba(0,0,0,0.15)',
+                        },
+                      }}
+                    >
+                      <EmojiPicker onSelectEmoji={handleSelectEmoji} />
+                    </Popover>
                     </Box>
                     </FlexBetween>
                     </Box>
