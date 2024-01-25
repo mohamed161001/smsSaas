@@ -102,7 +102,7 @@ const CustomTextField = (props) => {
   });
   
   
-  const EditContactPopup = ({ open, setOpen,contactId}) => {
+  const EditContactPopup = ({ open, setOpen,contact}) => {
     
     const { logout } = useLogout()
     const client = useSelector((state) => state.reducer.client)
@@ -112,13 +112,6 @@ const CustomTextField = (props) => {
     const token = useSelector((state) => state.reducer.token)
     const [search, setSearch] = useState("");
     
-    const { data, isLoading , error , isFetching } = useGetClientQuery({
-        token,
-        id: contactId || '',
-    })
-
-
-   
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [sort , setSort] = useState();
     const { data : groupsData, isLoading : groupsIsLoading , error : groupsError , isFetching : groupsIsFetching } = useGetGroupsQuery({
@@ -142,13 +135,13 @@ const CustomTextField = (props) => {
     const [group, setGroup] = useState([]);
 
     useEffect(() => {
-        if (open && data) {
-            setFirstName(data?.firstName)
+        if (open && contact) {
+            setFirstName(contact?.firstName)
             // setLastName(data?.lastName)
-            setPhoneNumber(data?.phoneNumber)
-            setGroup(data?.group || []);
+            setPhoneNumber(contact?.phoneNumber)
+            setGroup(contact?.group || []);
         }
-    }, [data , open])
+    }, [contact , open])
 
     const handleSubmit = async (e) => {
       try {
@@ -160,9 +153,24 @@ const CustomTextField = (props) => {
             group,
             client,
         };
-        console.log('payload',payload);
+        if (!firstName) {
+          setPopupError('Le nom est obligatoire');
+          return;
+        }
+        if (!phoneNumber) {
+          setPopupError('Le téléphone est obligatoire');
+          return;
+        }
+        if (phoneNumber.length !== 8) {
+          setPopupError('Le téléphone doit contenir 8 chiffres');
+          return;
+        }
+        if (group.length === 0) {
+          setPopupError('Le groupe est obligatoire');
+          return;
+        }
       const response = await updateClient({
-        id : contactId,
+        id : contact._id,
         token,
         client : payload
       });
@@ -192,11 +200,15 @@ const CustomTextField = (props) => {
 
 
   useEffect(() => {
-    if (error && error.status === 401) {
+    if (groupsError && groupsError.status === 401) {
+      logout()
+      console.log("unauthorized");
+    } 
+    if (updateClientError && updateClientError.status === 401) {
       logout()
       console.log("unauthorized");
     }
-  }, [error]);
+  }, [groupsError , updateClientError])
 
   return (
     <Dialog
@@ -228,15 +240,7 @@ const CustomTextField = (props) => {
         Modifier un contact
       </Typography>
     </DialogTitle>
-    <DialogContent dividers> 
-    { isFetching || isLoading || groupsIsLoading ? (
-      <Box sx={{ width: '100%' }}>
-        <Skeleton animation="wave" sx = {{ marginBottom: 1.2 , height: "2rem" }} />
-        <Skeleton animation="wave" sx = {{ marginBottom: 1.2, height: "2rem" }} />
-        <Skeleton animation="wave" sx = {{ marginBottom: 1.2 , height: "2rem"}} />
-        <Skeleton animation="wave" sx = {{ marginBottom: 1.2, height: "2rem" }} />
-      </Box>
-    ) : (
+    <DialogContent dividers>
       <form onSubmit={(e) => handleSubmit(e)} autoComplete="off" noValidate encType="multipart/form-data">
           <Grid container spacing={2}>
                 <Grid item xs={12} sm={12}>
@@ -261,28 +265,6 @@ const CustomTextField = (props) => {
                   size="small"
                   />
                 </Grid>
-                {/* <Grid item xs={12} sm={6}>
-                    <InputLabel
-                    sx = {{
-                        fontSize: "0.75rem",
-                        fontWeight: "600",
-                        color: "black",
-                        marginBottom: "0.5rem",
-                    }}
-                    >
-                        Prénom
-                    </InputLabel>
-                    <CustomTextField
-                    fullWidth
-                    id="lastName"
-                    name="lastName"
-                    value = {lastName}
-                    onChange = {(e) => setLastName(e.target.value)}
-                    variant="outlined"
-                    placeholder="Prénom du contact"
-                    size="small"
-                    />
-                </Grid> */}
                     <Grid item xs={12} sm={12}>
                     <InputLabel
                     sx = {{
@@ -332,7 +314,7 @@ const CustomTextField = (props) => {
                     // search from backend
                     onInputChange={(event, value) => setSearch(value)}
                     // add loading
-                    loading={isFetching || groupsIsLoading || groupsIsFetching}
+                    loading={ groupsIsLoading || groupsIsFetching}
                     noOptionsText={
                       <span
                         style={{
@@ -497,7 +479,7 @@ const CustomTextField = (props) => {
         </Button>
         <Button
           variant="contained"
-          disabled={updateClientIsLoading || isFetching}
+          disabled={updateClientIsLoading}
           type='submit'
           sx={{
             backgroundColor: "black",
@@ -519,7 +501,6 @@ const CustomTextField = (props) => {
         </Button>
       </Box>
       </form>
-    )}
     </DialogContent> 
     </Dialog>
   )

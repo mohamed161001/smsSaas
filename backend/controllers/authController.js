@@ -23,7 +23,7 @@ const register = async (req, res) => {
 }
 
 const createToken = (_id) => {
-    return jwt.sign({ _id }, process.env.SECRET, { expiresIn: '10d' })
+    return jwt.sign({ _id }, process.env.SECRET, { expiresIn: '15d' })
 }
 
 module.exports = { login, register }

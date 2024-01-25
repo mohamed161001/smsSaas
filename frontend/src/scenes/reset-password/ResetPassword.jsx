@@ -1,4 +1,5 @@
 import Box from "@mui/system/Box";
+import { useState } from "react";
 import logo from '../../assets/msini.png';
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
@@ -6,11 +7,19 @@ import Button from "@mui/material/Button";
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import InputLabel from '@mui/material/InputLabel';
+import { 
+    OutlinedInput,
+    InputAdornment,
+    IconButton,
+ } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useParams } from "react-router-dom";
 import { useForgetPasswordMutation } from "../../state/api";
+import { useUpdateUserMutation } from "../../state/api";
 import LockResetRoundedIcon from '@mui/icons-material/LockResetRounded';
 
 
@@ -48,30 +57,43 @@ const CustomTextField = (props) => {
 
 
 
-const ForgetPassword = () => {
+const ResetPassword = () => {
 
-  const [forgetPassword, { isLoading, error , isSuccess }] = useForgetPasswordMutation();
+  const [updateUser, { isSuccess, isError, isLoading, error }] = useUpdateUserMutation()
   const navigate = useNavigate();
+  const { token, id } = useParams();
+  const [showPassword, setShowPassword] = useState(false);
 
   const validationSchema = yup.object({
-    email: yup.string().email('Entrer un email valide').required('Email requis'),
+    password: yup
+      .string('Entrer votre mot de passe')
+      .required('Mot de passe requis'),
+    confirmPassword: yup.string()
+        .oneOf([yup.ref('password'), null], 'Les mots de passe ne correspondent pas')
+        .required('Confirmer votre mot de passe'),
   });
+
+  
 
   const formik = useFormik({
     initialValues: {
-      email: '',
+      password: '',
+      confirmPassword: '',
     },
     validationSchema: validationSchema,
     onSubmit: async(values) => {
-      try {
-        const response = await forgetPassword({
-          email: values.email
-        })
-        if (response?.data?.success)
-        navigate('/login', { replace: true })
-      } catch (error) {
-        console.error("Error during login:", error);
-      }
+        const formData = new FormData()
+        formData.append('password', values.password)
+        try {
+            const response = await updateUser({ 
+                id: id,
+                user: formData,
+                token
+            })
+        }
+        catch (err) {
+            console.log(err)
+        }
     },
   });
   
@@ -90,9 +112,9 @@ const ForgetPassword = () => {
           }}
         >
           <img src={logo} alt="logo" style={{ 
-            height: 'auto',
-            width: '7.5rem',
-            marginTop: '1.5rem',
+                        height: 'auto',
+                        width: '7.5rem',
+                        marginTop: '1.5rem',
             }} />
         </Box>
       <Box 
@@ -117,7 +139,6 @@ const ForgetPassword = () => {
                     alignItems: "center",
                     mb: 2,
                 }}>
-                    {/* <img src={logo} alt="logo" style={{ maxWidth: "200px", height: "auto" }} /> */}
                     <LockResetRoundedIcon sx={{ fontSize: 50 , color: "#FF6100" , backgroundColor: "#ffefe6", borderRadius: "50%" , padding: "0.5rem"}}/>
                 </Box>
                 <Typography variant="h6"
@@ -129,7 +150,7 @@ const ForgetPassword = () => {
                         textAlign: 'center',
                         }}
                     >
-                        Mot de passe oublié ?
+                        Réinitialiser mot de passe
                     </Typography>
                     
             </Grid>
@@ -148,22 +169,115 @@ const ForgetPassword = () => {
                             marginTop: "1rem",
                         }}
                         >
-                            Email
+                            Nouveau mot de passe
                         </InputLabel>
-                        <CustomTextField
+                        <OutlinedInput
                         required
                         fullWidth
-                        id="email"
-                        name="email"
+                        id="password"
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
                         onChange={formik.handleChange}
-                        placeholder="Entrer votre email"
+                        placeholder="Entrer votre nouveau mot de passe"
                         variant="outlined"
-                        error={formik.touched.email && Boolean(formik.errors.email)}
-                        helperText={formik.touched.email && formik.errors.email}
+                        error={formik.touched.password && Boolean(formik.errors.password)}
+                        helpertext={formik.touched.password && formik.errors.password}
                         size="small"
-                        sx ={{
-                            marginBottom:"0.5rem"
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                onClick={() => setShowPassword(!showPassword)}
+                                >
+                                {showPassword ? <VisibilityOff/> : <Visibility />}
+                                </IconButton>
+                            </InputAdornment>
+                            }
+                        sx = {{
+                            backgroundColor: '#f2f2f2',
+                            borderRadius: '8px',
+                            fontSize: '0.5rem',
+                            '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                                borderColor: 'black',
+                            },
+                            borderRadius: '8px',
+                            },
+                            '.MuiSvgIcon-root': {
+                            color: '#000',
+                            fontSize: '1rem',
+                            },
+                            '.MuiOutlinedInput-notchedOutline' : {
+                                borderColor: '#f2f2f2',
+                            },
+                            }}
+                        inputProps={{style: {
+                            fontSize: "0.75rem",
+                            fontWeight: "600",
+                            padding: "0.75rem 0.45rem",
+                            borderRadius: "20px",
+                        }}}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        < InputLabel
+                        id="demo-simple-select-label"
+                        sx={{
+                            fontSize: "0.75rem",
+                            fontWeight: "500",
+                            color: "black",
+                            marginBottom: "0.5rem",
+                            marginTop: "1rem",
                         }}
+                        >
+                            Confirmer mot de passe
+                        </InputLabel>
+                        <OutlinedInput
+                        required
+                        fullWidth
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
+                        onChange={formik.handleChange}
+                        placeholder="Confirmer le nouveau mot de passe"
+                        variant="outlined"
+                        error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+                        helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                        size="small"
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                onClick={() => setShowPassword(!showPassword)}
+                                >
+                                {showPassword ? <VisibilityOff/> : <Visibility />}
+                                </IconButton>
+                            </InputAdornment>
+                            }
+                        sx = {{
+                            backgroundColor: '#f2f2f2',
+                            borderRadius: '8px',
+                            fontSize: '0.5rem',
+                            '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                                borderColor: '#f2f2f2',
+                            },
+                            borderRadius: '8px',
+                            },
+                            '.MuiSvgIcon-root': {
+                            color: '#000',
+                            fontSize: '1rem',
+                            },
+                            '.MuiOutlinedInput-notchedOutline' : {
+                                borderColor: '#f2f2f2',
+                            },
+                            }}
+                        inputProps={{style: {
+                            fontSize: "0.75rem",
+                            fontWeight: "600",
+                            padding: "0.75rem 0.45rem",
+                            borderRadius: "20px",
+                        }}}
                         />
                     </Grid>
                     <Grid item xs={10} mt={2}>
@@ -182,12 +296,12 @@ const ForgetPassword = () => {
                             width: "100%",
                             boxShadow: "none",
                             '&:hover': {
-                              backgroundColor: "#2b2b2b",
-                              boxShadow: "none",
-                            },
+                                backgroundColor: "#2b2b2b",
+                                boxShadow: "none",
+                              },
                         }}
                         >
-                        Réinitialiser mot de passe
+                        Réinitialiser
                         </Button>
                     </Grid>
                     {
@@ -199,7 +313,7 @@ const ForgetPassword = () => {
                         fontSize: "0.75rem",
                         fontWeight: "600",
                       }}
-                      >{error?.data?.error}</Alert>
+                      >{error?.data?.error || error?.data?.message}</Alert>
                     }
                     {
                       isSuccess && <Alert 
@@ -210,7 +324,7 @@ const ForgetPassword = () => {
                         fontSize: "0.75rem",
                         fontWeight: "600",
                       }}
-                      >Un email de réinitialisation de mot de passe a été envoyé à votre adresse email</Alert>
+                      >Votre mot de passe a été réinitialisé avec succès</Alert>
                     }
                     <Grid 
                       item
@@ -254,4 +368,4 @@ const ForgetPassword = () => {
     );
 }
  
-export default ForgetPassword;
+export default ResetPassword;

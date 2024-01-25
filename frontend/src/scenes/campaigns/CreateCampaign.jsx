@@ -12,6 +12,7 @@ import {
     Avatar,
     Chip,
     IconButton,
+    Alert,
 } from '@mui/material';
 import {
     MoodRounded,
@@ -25,6 +26,7 @@ import FlexBetween from '../../components/FlexBetween';
 import MessageStep from '../../components/MessageStep';
 import TargetingStep from '../../components/TargetingStep';
 import CampaignSummary from '../../components/CampaignSummary';
+import { useSelector } from 'react-redux';
 
 
 const CustomTextField = (props) => {
@@ -66,8 +68,13 @@ const CustomTextField = (props) => {
 
 const CreateCampaign = () => {
 
-    const [activeStep, setActiveStep] = useState(0);
-    
+  const user = useSelector((state) => state.reducer.user)
+
+  const isSmsTokenEmpty = user.smsToken === null || user.smsToken === undefined || user.smsToken === ''
+  const ismsNumberDevEmpty = user.smsNumberDev === null || user.smsNumberDev === undefined || user.smsNumberDev === ''
+
+  const [activeStep, setActiveStep] = useState(0);
+  const [isCampiagnSummaryLoading, setIsCampiagnSummaryLoading] = useState(false);
 
     const steps = [
         'Contacts',
@@ -95,14 +102,15 @@ const CreateCampaign = () => {
     // enough credits or not
     const [notEnoughCredits, setNotEnoughCredits] = useState(false)
 
+
     const isNextDisabled = () => {
       switch (activeStep) {
           case 0:
               return !campaignName || !campaignGroup || campaignGroup.length === 0;
           case 1:
               return !message || message.length === 0;
-          // case 2:
-          //     return notEnoughCredits;
+          case 2:
+              return notEnoughCredits || isCampiagnSummaryLoading;
           default:
               return false;
       }
@@ -196,12 +204,28 @@ const CreateCampaign = () => {
         <MessageStep message={message} setMessage={setMessage} />
       )}
       {activeStep === 2 && (
-        <CampaignSummary campaignName={campaignName} campaignGroup={campaignGroup} message={message} setNotEnoughCredits={setNotEnoughCredits} notEnoughCredits={notEnoughCredits} />
+        <CampaignSummary campaignName={campaignName} campaignGroup={campaignGroup} message={message} setNotEnoughCredits={setNotEnoughCredits} notEnoughCredits={notEnoughCredits} setIsCampiagnSummaryLoading={setIsCampiagnSummaryLoading}/>
       )}
       {activeStep === steps.length  && (
          <TargetingStep campaignName={campaignName} setCampaignName={setCampaignName} campaignGroup={campaignGroup} setCampaignGroup={setCampaignGroup}/>
       )}
     </Box>  
+      { isSmsTokenEmpty && ismsNumberDevEmpty && 
+        <Alert 
+        severity="error"
+        sx={{
+            fontSize: "0.68rem",
+            fontWeight: "600",
+            display: "flex",
+            alignItems: "center",
+            borderRadius: "8px",
+            marginTop: "1rem",
+            width: "fit-content",
+        }}
+        >
+          Veuillez configurer votre compte dans les paramètres pour pouvoir envoyer des SMS
+        </Alert>
+      }
     { activeStep !== steps.length &&
                     <Box sx={{mt:"1.5rem"}}>
                         <Button
@@ -230,8 +254,7 @@ const CreateCampaign = () => {
                         <Button 
                         variant="contained"
                         onClick={handleNext}
-                        disabled={isNextDisabled()}
-                        // add an icon to the button if it's the last step
+                        disabled={isNextDisabled() || isSmsTokenEmpty || ismsNumberDevEmpty}
                         startIcon={activeStep === steps.length - 1 ? <SendRounded/> : null}
                         sx={{
                             backgroundColor: "black",

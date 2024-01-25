@@ -103,7 +103,12 @@ const Register = () => {
 
   return (
     <Grid container component="main" sx={{ height: '100vh' }}>
-      <Grid item xs={12} sm={8} md={6} component={Paper} elevation={6} square>
+      <Grid item xs={12} sm={8} md={6} component={Paper} elevation={6} square
+      sx={{
+        flexGrow: { xs: 1, sm: 1, md: 0 },
+        maxWidth: { xs: '100%', sm: '100%', md: '50%' },
+      }}
+      >
         <Box
           sx={{
               display: 'flex',
@@ -112,7 +117,13 @@ const Register = () => {
               mt : 3,
           }}
         >
-          <img src={logo} alt="logo" style={{ width: '19%', height: 'auto' }} />
+          <img 
+          src={logo}
+          alt="logo" 
+          style={{ 
+            width: '7.5rem',
+            height: 'auto',
+          }} />
         </Box>
         <Box
           sx={{
@@ -311,7 +322,7 @@ const Register = () => {
               fullWidth
               variant="contained"
               sx={{
-                backgroundColor: "#f55d00",
+                backgroundColor: "black",
                 color: "#fff",
                 borderRadius: "7px",
                 boxShadow: "none",
@@ -321,8 +332,8 @@ const Register = () => {
                 textTransform: "none",
                 marginTop: "0.8rem",
                 '&:hover': {
+                  backgroundColor: "#2b2b2b",
                   boxShadow: "none",
-                  backgroundColor: "#eb5900",
                 },
               }}
             >
@@ -359,6 +370,7 @@ const Register = () => {
                 Vous avez déjà un compte ?{" "}
               <a
                 onClick={() => {navigate("/login", { replace: true });}}
+                style={{ cursor: 'pointer' }}
               >
                 {" "}Connectez-vous
               </a>
@@ -373,13 +385,11 @@ const Register = () => {
         sm={4}
         md={6}
         sx={{
-          // backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
           backgroundRepeat: 'no-repeat',
-          // backgroundColor: (t) =>
-          //   t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           background: '#f55d00',
+          display: { xs: 'none', sm: 'none', md: 'block' },
         }}
       >
         <Box

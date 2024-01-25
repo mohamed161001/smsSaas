@@ -42,7 +42,10 @@ const Navbar = ({isSidebarOpen, setIsSidebarOpen}) => {
     const token = useSelector((state) => state.reducer.token)
     const apiUrl = import.meta.env.VITE_API_URL;
 
-    const { data, isLoading, error } = useGetUserQuery({ id: user?._id, token })
+    const { data, isLoading, error } = useGetUserQuery({ 
+        id: user?._id || '',
+        token 
+    })
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -99,7 +102,10 @@ const Navbar = ({isSidebarOpen, setIsSidebarOpen}) => {
                                 aria-haspopup="true"
                                 aria-expanded={open ? 'true' : undefined}
                             >
-                            <Avatar src={`${apiUrl}/${data?.user.image}`} sx={{width:"2rem", height:"2rem",}}/>
+                            <Avatar 
+                            // src={`${apiUrl}/${data?.user.image}`}
+                            src={data?.user.image ? `${apiUrl}/${data?.user.image}` : ''}
+                            sx={{width:"2rem", height:"2rem",}}/>
                             </IconButton>
                                 ) : (
                                     <Skeleton variant="circular" width={35} height={35} sx = {{mr:"0.7rem"}}/>
@@ -143,7 +149,7 @@ const Navbar = ({isSidebarOpen, setIsSidebarOpen}) => {
                                 }}
                             >
             <FlexBetween gap="0.2rem" p="0.5rem 1rem">
-                <Avatar src={`${apiUrl}/${data?.user.image}`} sx={{width:"1.8rem", height:"1.8rem",}}/>
+                <Avatar src={data?.user.image ? `${apiUrl}/${data?.user.image}` : ''} sx={{width:"1.8rem", height:"1.8rem",}}/>
                 <Box>
                     <Typography sx={{fontSize:"0.7rem", fontWeight:"600", color:"#000"}}>
                         {data?.user.firstName ?? ''} { data?.user.lastName ?? ''}

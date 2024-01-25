@@ -167,6 +167,7 @@ const updateContact = async (req, res) => {
 const createContacts = async (req, res) => {
   const { client,group, contacts } = req.body;
   try {
+    const existingContacts = [];
     const uniqueContacts = Array.from(new Set(contacts.map(contact => contact.phoneNumber)))
       .map(phoneNumber => contacts.find(contact => contact.phoneNumber === phoneNumber));
     
@@ -174,6 +175,9 @@ const createContacts = async (req, res) => {
     const contactsToInsert = await Promise.all(
       uniqueContacts.map(async (contact) => {
         const exists = await Contact.exists({ phoneNumber: contact.phoneNumber , client});
+        if (exists) {
+          existingContacts.push(exists);
+        }
         // add the client and group fields to the contact object
         return exists ? null : { ...contact, client, group };
       })
@@ -182,15 +186,38 @@ const createContacts = async (req, res) => {
     // Filter out null values from the array (contacts that already exist)
     const filteredContactsToInsert = contactsToInsert.filter(contact => contact !== null);
 
+    const existingContactsCount = contactsToInsert.length - filteredContactsToInsert.length;
+
+    let message = `${filteredContactsToInsert.length} contacts créés.`;
+
+    if (existingContactsCount !== 0) {
+      message += ` ${existingContactsCount} contacts déjà existants.`; 
+      // for each existing contact, add the group to the existing contact if it does not exist
+      await Promise.all(
+        existingContacts.map(async (contact) => {
+          const contactToUpdate = await Contact.findById(contact._id);
+          // find the groups that do not exist in the existing contact
+          const groupsToAddIds = group.filter(group => !contactToUpdate.group.includes(group._id));
+          // array of group ids to add to the existing contact
+          const groupsToAdd = groupsToAddIds.map(group => group._id);
+          await Contact.findByIdAndUpdate(contact._id, {
+            group: [...contactToUpdate.group, ...groupsToAdd]
+          });
+        })
+      );
+      
+
+    }
+
     if (filteredContactsToInsert.length === 0) {
-      return res.status(200).json({ message: "0 contacts créés" });
+      return res.status(200).json({ message});
     }
 
     const createdContacts = await Contact.insertMany(filteredContactsToInsert);
 
-
+    
     // return a message with the number of created contacts
-    res.status(200).json({ message: `${createdContacts.length} contacts créés` });
+    res.status(200).json({ message});
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

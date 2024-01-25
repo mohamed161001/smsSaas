@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux'
 import { useLogout } from '../hooks/useLogout';
 import { useGetSmsBalanceQuery } from '../slices/CampaignSlice';
 
-const CampaignSummary = ({campaignName, campaignGroup, message,setNotEnoughCredits,notEnoughCredits}) => {
+const CampaignSummary = ({campaignName, campaignGroup, message,setNotEnoughCredits,notEnoughCredits,setIsCampiagnSummaryLoading}) => {
 
   const { logout } = useLogout()
   const clientId = useSelector((state) => state.reducer.client)
@@ -22,11 +22,17 @@ const CampaignSummary = ({campaignName, campaignGroup, message,setNotEnoughCredi
       token: token,
     })
 
+    // if the loading is true, set the isCampiagnSummaryLoading to true then set it to false when the loading is done
+    React.useEffect(() => {
+      if (isLoading) {
+        setIsCampiagnSummaryLoading(true);
+      } else {
+        setIsCampiagnSummaryLoading(false);
+      }
+    }, [isLoading, setIsCampiagnSummaryLoading]);
 
 
-    // the sms status is expired
     const isExpired = data && data.availableUnits.status === 'EXPIRED';
-    // the user doesn't have enough credit
     const notEnoughCredit = data && data.availableUnits.availableUnits < campaignGroup.numberOfContacts;
 
     // set the not enough credit to true if the user doesn't have enough credit or if the sms status is expired

@@ -82,21 +82,16 @@ const CustomTextField = (props) => {
 
     const [popupError, setPopupError] = useState('');
 
-    // get the group to edit
-    const { data, isFetching, error , isLoading } = useGetGroupQuery({
-        token,
-        id: groupToEdit || '',
-  });
 
   const [updateGroup, { isLoading: isUpdating, error: updateError }] = useUpdateGroupMutation();
 
     const [name, setName] = useState('');
 
     useEffect(() => {
-        if (open && data) {
-            setName(data?.name)
+        if (open) {
+            setName(groupToEdit?.name)
         }
-    }, [data , open])
+    }, [open])
     
     const handleSubmit = async (e) => {
         try {
@@ -106,7 +101,7 @@ const CustomTextField = (props) => {
           };
           
         const response = await updateGroup({
-          id : groupToEdit,
+          id : groupToEdit._id,
           token,
           group : payload
         });
@@ -129,11 +124,11 @@ const CustomTextField = (props) => {
   }, [open]);
 
   useEffect(() => {
-    if (error && error.status === 401) {
+    if (updateError && updateError.status === 401) {
       logout()
       console.log("unauthorized");
     }
-  }, [error]);
+  }, [updateError]);
 
   return (
     <Dialog
@@ -163,14 +158,6 @@ const CustomTextField = (props) => {
       </Typography>
     </DialogTitle>
     <DialogContent dividers> 
-    { isLoading || isFetching ? (
-      <Box sx={{ width: '100%' }}>
-        <Skeleton animation="wave" sx = {{ marginBottom: 1.2 , height: "2rem" }} />
-        <Skeleton animation="wave" sx = {{ marginBottom: 1.2, height: "2rem" }} />
-        <Skeleton animation="wave" sx = {{ marginBottom: 1.2 , height: "2rem"}} />
-        <Skeleton animation="wave" sx = {{ marginBottom: 1.2, height: "2rem" }} />
-      </Box>
-    ) : (
       <form onSubmit={(e) => handleSubmit(e)} autoComplete="off" noValidate encType="multipart/form-data">
           <Grid container spacing={2}>
                 <Grid item xs={12} sm={12}>
@@ -245,7 +232,7 @@ const CustomTextField = (props) => {
         </Button>
         <Button
           variant="contained"
-          disabled={isLoading || isFetching || isUpdating}
+          disabled={isUpdating}
           type='submit'
           sx={{
             backgroundColor: "black",
@@ -267,7 +254,6 @@ const CustomTextField = (props) => {
         </Button>
       </Box>
       </form>
-      )}
     </DialogContent> 
     </Dialog>
   )

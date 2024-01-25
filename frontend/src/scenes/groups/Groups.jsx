@@ -66,6 +66,7 @@ const Groups = () => {
 
 
 
+
  //handling the delete
  const [deleteGroup, { isLoading: isDeleting, error: deleteError }] = useDeleteGroupMutation();
 
@@ -100,8 +101,8 @@ const Groups = () => {
  const [openEdit,setOpenEdit] = useState(false);
  const [groupToEdit, setGroupToEdit] = useState(null);
 
- const handleEditClick = (id) => {
-    setGroupToEdit(id);
+ const handleEditClick = (group) => {
+    setGroupToEdit(group);
     setOpenEdit(true);
   };
 
@@ -150,7 +151,7 @@ const Groups = () => {
                 />
               </IconButton> */}
               <IconButton
-                onClick = {() => handleEditClick(params.row._id)}
+                onClick = {() => handleEditClick(params.row)}
               >
                 <EditRounded
                   sx = {{

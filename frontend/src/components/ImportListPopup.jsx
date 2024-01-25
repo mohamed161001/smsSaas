@@ -14,15 +14,18 @@ import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import Autocomplete from '@mui/material/Autocomplete';
 import MenuItem from '@mui/material/MenuItem';
+import Alert  from '@mui/material/Alert';
 import List from '@mui/material/List';
 import InputAdornment from '@mui/material/InputAdornment';
-
+import Snackbar  from '@mui/material/Snackbar';
+import * as XLSX from 'xlsx';
 import { SearchRounded } from '@mui/icons-material';
 import {useGetGroupsQuery} from '../slices/GroupSlice'
 import { useSelector } from 'react-redux';
 import DragNDrop from './DragNDrop';
 import { useParams } from 'react-router-dom';
 import { useLogout } from '../hooks/useLogout';
+import { useAddClientsMutation } from '../slices/ClientSlice';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -83,17 +86,20 @@ const ListboxComponent = React.forwardRef((props, ref) => {
     );
   });
 
-export default function ImportMenu({ open, setOpen }) {
+export default function ImportMenu({ open, setOpen, setSnackbarOpen, setMessage }) {
     
     const [ file, setFile ] = React.useState()
     const [ title, setTitle ] = React.useState()
+
     const { id } = useParams();
     
     const token = useSelector((state) => state.reducer.token)
     const { logout } = useLogout()
     const client = useSelector((state) => state.reducer.client)
     const [search , setSearch] = useState("");
-    const [campaignGroup, setCampaignGroup] = useState([] || null);
+    const [groups, setGroups] = useState([] || null);
+    const [selectedGroups, setSelectedGroups] = useState([]);
+    const [uploadedContacts, setUploadedContacts] = useState([]);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [sort , setSort] = useState();
     const { data,isLoading: isLoadingGroups, error: errorGroups,isFetching : isFetchingGroups } = useGetGroupsQuery({
@@ -105,33 +111,117 @@ export default function ImportMenu({ open, setOpen }) {
         token
       });
 
-    
-    
-    // const handleSubmit = async () => {
-    //     try {
-    //         if (!title) {
-    //             throw Error("Le titre est obligatoire");
-    //         }
-    //         if (!file) {
-    //             throw Error("L'image est obligatoire");
-    //         }
 
-    //         const formData = new FormData();
-    //         formData.append('Image', file);
-    //         formData.append('title', title);
+      // import the contacts from the excel file they have name and phone number
+      const importContacts = (file) => {
+        const reader = new FileReader();
+      
+        reader.onload = (event) => {
+          const bstr = event.target.result;
+          const workBook = XLSX.read(bstr, { type: "binary" });
+          const workSheetName = workBook.SheetNames[0];
+          const workSheet = workBook.Sheets[workSheetName];
+      
+          const contacts = [];
 
-    //         const response = updatePatient({
-    //             id: id,
-    //             patient: formData,
-    //             token
-    //         })
-    //         setTitle('');
-    //         setFile(null);
-    //         setOpen(false);
-    //     } catch (error) {
-    //         console.log(error.message);   
-    //     }
-    // }
+          // make sure that A1 and B1 are the name and phone number
+          const nameHeader = workSheet["A1"]?.v;
+          const phoneHeader = workSheet["B1"]?.v;
+
+          if (nameHeader !== "name" || phoneHeader !== "phone") {
+            setPopupError('Le fichier doit contenir les colonnes "name" et "phone"');
+            return;
+          }
+          // Assuming that "A1" contains the name and "A2" contains the phone number
+          for (let i = 2; ; i++) {
+            // Start from the second row
+            const nameCell = workSheet[`A${i}`];
+            const phoneCell = workSheet[`B${i}`];
+      
+            // Break the loop if either of the cells is undefined (no more data)
+            if (!nameCell || !phoneCell) {
+              break;
+            }
+      
+            // Extract the name and phone number from the cells
+            const firstName = nameCell.v;
+            const phoneNumber = phoneCell.v;
+      
+            // Push the data into the contacts array
+            contacts.push({ firstName, phoneNumber });
+          }
+      
+          // Log the extracted data in the specified format
+          setUploadedContacts(contacts);
+        };
+      
+        // Start reading the file as a binary string
+        reader.readAsBinaryString(file);
+      };
+      
+      //use the importContacts function when a file is dropped
+      useEffect(() => {
+        if (file?.type === 'application/vnd.ms-excel' || file?.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file?.type === 'text/csv') {
+          importContacts(file);
+        } else {
+          console.log('Invalid file type. Please choose a CSV or XLSX file.');
+        }
+      }, [file]);
+
+      useEffect(() => {
+        if (file) {
+            setPopupError('');
+        }
+    }, [file]);
+
+      
+      // adding the contacts
+      const [addClients, { isLoading: isAddingClients , error,isSuccess}] = useAddClientsMutation();
+      const handleSubmit = async () => {
+        const data = {
+          client: client,
+          group : groups,
+          contacts : uploadedContacts
+        }
+        if (groups.length === 0) {
+          setPopupError('Le groupe est obligatoire');
+          return;
+        }
+        if (!(file?.type === 'application/vnd.ms-excel' || file?.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file?.type === 'text/csv')){
+          setPopupError('Le type de fichier doit être CSV ou XLSX.');
+          return;
+        }
+        try {
+        const response = await addClients({
+            clients: data,
+            token
+        });
+        if (response.error) {
+          setPopupError(response.error.data.error);
+            return;
+        }
+        setMessage(response?.data?.message)
+        setSnackbarOpen(true)
+        setOpen(false)
+        } catch (error) {
+          console.log(error);
+          setPopupError(response.error.data.error);
+        }
+      }
+
+      console.log(uploadedContacts);
+
+    // handling the error popup
+    const [popupError, setPopupError] = useState('');
+
+    useEffect(() => {
+      if (!open) {
+          setPopupError('');
+          setFile(null);
+          setGroups([]);
+          setUploadedContacts([]);
+      }
+    }, [open]);
 
     useEffect(() => {
         if (errorGroups && errorGroups.status === 401) {
@@ -144,7 +234,7 @@ export default function ImportMenu({ open, setOpen }) {
     useEffect(() => {
         if (open) {
             setFile(null);
-            setCampaignGroup([]);
+            setGroups([]);
         }
     }, [open])
 
@@ -154,7 +244,7 @@ export default function ImportMenu({ open, setOpen }) {
             onClose={() => {
                 setFile(null);
                 setOpen(false);
-                setCampaignGroup([]); 
+                setGroups([]); 
             }}
             aria-labelledby="customized-dialog-title"
             open={open}
@@ -196,7 +286,17 @@ export default function ImportMenu({ open, setOpen }) {
                 >
                    Liste des contacts
                 </InputLabel>
-
+                <Typography
+                variant="body1"
+                sx={{
+                  fontSize: '0.65rem',
+                  fontWeight: '500',
+                  color: '#000',
+                  mb: '0.5rem',
+                }}
+              >
+                Télécharger un fichier d'exemple avant d'importer <a href={`${import.meta.env.VITE_FRONTEND_URL}/src/assets/Contacts_Sample.xlsx`} download="Contacts_Sample.xlsx" target="_blank" rel="noopener noreferrer" style={{color: "#FF6100", textDecoration: "underline"}}> cliquez ici</a>
+              </Typography>
                 <DragNDrop setFile={setFile} />
                 <InputLabel
                     id="demo-simple-select-label"
@@ -215,7 +315,7 @@ export default function ImportMenu({ open, setOpen }) {
                     multiple
                     id="group"
                     name="group"
-                    value={campaignGroup}
+                    value={groups}
                     // search from backend
                     onInputChange={(event, value) => {
                       setSearch(value);
@@ -242,8 +342,10 @@ export default function ImportMenu({ open, setOpen }) {
                         Chargement...
                       </span>
                     }
+                    
                     onChange={(event, value) => {
-                        setCampaignGroup(value);
+                      setGroups(value);
+                      setSelectedGroups(value.map((group) => group._id));
                     }}
                     options={data?.groups || []}
                     getOptionLabel={(option) => option.name}
@@ -318,9 +420,6 @@ export default function ImportMenu({ open, setOpen }) {
                         borderColor: '#1976d2',
                         borderWidth: '1px',
                     },
-                  //   '& .MuiAutocomplete-endAdornment': {
-                  //     display: 'none',
-                  // },
                     }}
                     ListboxProps={{
                       style: {
@@ -329,12 +428,27 @@ export default function ImportMenu({ open, setOpen }) {
                     }}
                     ListboxComponent = {ListboxComponent}
                   />
-
+                  {popupError && (
+                        <Alert 
+                        severity="error"
+                        // choose the small 
+                        sx={{
+                            fontSize: "0.68rem",
+                            fontWeight: "600",
+                            // make the icon and the text align vertically
+                            display: "flex",
+                            alignItems: "center",
+                            borderRadius: "8px",
+                            mt :'1rem',
+                        }}
+                        >{popupError}</Alert>
+                    )}
             </DialogContent>
             <DialogActions>
                 <Button 
                     autoFocus 
-                    // onClick={() => handleSubmit()}
+                    onClick={() => handleSubmit()}
+                    disabled = {isAddingClients}
                     variant="contained"
                     type='submit'
                     sx={{

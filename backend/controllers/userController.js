@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt')
 
 
@@ -14,9 +15,15 @@ const sendNewPassword = async (req, res) => {
             return res.status(404).json({ error: "utilisateur n'existe pas" });
         }
 
-        const newPwd = generatePassword(6, true, true, true);
+        // generate token
+        const token = jwt.sign(
+            { _id: user._id },
+            process.env.SECRET,
+            { expiresIn: '30m' }
+        );
 
-        user.password = await hashPassword(newPwd)
+        const link = `http://localhost:5173/reset-password/${user._id}/${token}`;
+
         await user.save();
 
         var transporter = nodemailer.createTransport({
@@ -29,18 +36,30 @@ const sendNewPassword = async (req, res) => {
         });
           
         var mailOptions = {
-        from: process.env.EMAIL,
+        from: 'Smsini <' + process.env.EMAIL + '>',
         to: email,
-        subject: 'Dentixio - réinstaller votre mot de passe ',
-        html: `votre nouvelle mot de passe est : <b style="color: #4b67e4"> ${newPwd} </b>`
+        subject: 'Smsini - réinstaller votre mot de passe ',
+        html: `<div style="text-align: center; font-family: 'Arial', sans-serif;">
+
+        <p style="font-size: 14px;font-weight: bold;">Bonjour ${user.firstName} ${user.lastName},</p>
+        <p style="font-size: 14px;">Vous avez demandé à réinitialiser votre mot de passe Smsini.</p>
+        
+        <a href="${link}" style="display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #000; color: #fff; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold;">Réinitialiser votre mot de passe</a>
+    
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="font-size: 14px; margin-bottom: 10px;">Si vous n'avez pas demandé à réinitialiser votre mot de passe, vous pouvez ignorer cet email.</p>
+            <p style="font-size: 14px;">Merci,</p>
+            <p style="font-size: 14px;">L'équipe Smsini</p>
+        </div>
+    
+    </div>
+    `
         };
 
         transporter.sendMail(mailOptions, function(error, info){
             if (error) {
-                console.error("Email sending failed:", error);
                 return res.status(500).json({ error: "Email sending failed" });
             } else {
-                console.log('Email sent: ' + info.response);
                 return res.status(200).json({ message: "Mail envoyé avec succès, veuillez vérifier votre boite mail" });
             }
         });

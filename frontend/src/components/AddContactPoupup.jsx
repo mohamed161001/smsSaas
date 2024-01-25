@@ -155,7 +155,9 @@ const CustomTextField = (props) => {
               setPopupError('Le groupe est obligatoire');
               return;
           }
+          
             try {
+
                 const response = await addClient({
                     client: data,
                     token
@@ -249,31 +251,6 @@ const CustomTextField = (props) => {
                   autoComplete="off"
                   />
                 </Grid>
-                {/* <Grid item xs={12} sm={6}>
-                    <InputLabel
-                    sx = {{
-                        fontSize: "0.75rem",
-                        fontWeight: "600",
-                        color: "black",
-                        marginBottom: "0.5rem",
-                    }}
-                    >
-                        Prénom
-                    </InputLabel>
-                    <CustomTextField
-                    fullWidth
-                    id="lastName"
-                    name="lastName"
-                    value = {formik.values.lastName}
-                    onChange = {formik.handleChange}
-                    error = {formik.touched.lastName && Boolean(formik.errors.lastName)}
-                    helperText = {formik.touched.lastName && formik.errors.lastName}
-                    variant="outlined"
-                    placeholder="Prénom du contact"
-                    size="small"
-                    autoComplete="off"
-                    />
-                </Grid> */}
                     <Grid item xs={12} sm={12}>
                     <InputLabel
                     sx = {{
@@ -440,7 +417,6 @@ const CustomTextField = (props) => {
                         <Alert 
                         severity="error"
                         // choose the small 
-
                         sx={{
                             fontSize: "0.68rem",
                             fontWeight: "600",
