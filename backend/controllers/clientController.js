@@ -95,8 +95,6 @@ const deleteClient = async (req, res) => {
       return res.status(404).json({ error: 'Client inexistant' });
     }
 
-    await User.findByIdAndDelete({ client: client._id });
-
     res.status(200).json({ client });
   } catch (error) {
     res.status(400).json({ error: error.message });

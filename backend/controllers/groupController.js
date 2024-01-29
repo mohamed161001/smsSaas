@@ -1,8 +1,6 @@
 const Group = require('../models/groupModel');
 const Contact = require('../models/contactModel');
 const mongoose = require('mongoose');
-const validator = require('validator');
-const bcrypt = require('bcrypt');
 
 //get all groups
 const getGroups = async (req, res) => {

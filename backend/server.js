@@ -11,6 +11,7 @@ const clientRoutes = require('./routes/clientRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const groupRoutes = require('./routes/groupRoutes');
 const campaignRoutes = require('./routes/campaignRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 const authMiddleware = require('./middlewares/auth');
 
 // express app
@@ -35,6 +36,7 @@ app.use('/api/client', clientRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/group', groupRoutes);
 app.use('/api/campaign', campaignRoutes);
+app.use('/api/payment', paymentRoutes);
 app.use('/api/profile',profileRoutes);
 
 //connect to mongodb
