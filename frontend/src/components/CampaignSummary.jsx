@@ -22,6 +22,7 @@ const CampaignSummary = ({campaignName, campaignGroup, message,setNotEnoughCredi
       token: token,
     })
 
+
     // if the loading is true, set the isCampiagnSummaryLoading to true then set it to false when the loading is done
     React.useEffect(() => {
       if (isLoading) {
@@ -208,7 +209,7 @@ const CampaignSummary = ({campaignName, campaignGroup, message,setNotEnoughCredi
             color: '#000',
           }}
           >
-            {isExpired || notEnoughCredit ? 0 : data && data.availableUnits.availableUnits}
+          {isExpired ? 0 : data && data.availableUnits.availableUnits}
           </Typography>
         </Grid>
         <Grid item xs={12} sm={4}>

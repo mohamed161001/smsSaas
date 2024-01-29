@@ -24,10 +24,22 @@ export const campaignSlice = api.injectEndpoints({
             }),
             providesTags: ['Campaign'],
         }),
+        createCampaign: build.mutation({
+            query: ({campaign,token}) => ({
+                url: "/api/campaign/createCampaign",
+                method: "POST",
+                body: campaign,
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+            }),
+            invalidatesTags: ['Campaign'],
+        }),
     })
 });
 
 export const {
     useGetCampaignsQuery,
     useGetSmsBalanceQuery,
+    useCreateCampaignMutation,
 } = campaignSlice;

@@ -32,7 +32,7 @@ export const groupSlice = api.injectEndpoints({
                   Authorization: `Bearer ${token}`,
                 },
             }),
-            invalidatesTags: ['Group'],
+            invalidatesTags: ['Group','Client'],
         }),
         getGroup: build.query({
             query: ({id,token}) => ({

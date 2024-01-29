@@ -106,7 +106,6 @@ const CustomTextField = (props) => {
           group : payload
         });
         if (response.error) {
-          console.log(response);
           setPopupError(response.error.data.error);
           return;
         }

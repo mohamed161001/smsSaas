@@ -64,6 +64,8 @@ const Groups = () => {
     token
   });
 
+  console.log(data);
+
 
 
 

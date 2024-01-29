@@ -72,6 +72,17 @@ export const api = createApi({
       onError: (error) => {console.log(error);},
       invalidatesTags: ["Users"],
     }),
+    getUserSmsBalance: build.query({
+      query: ({user,token}) => ({
+        url: "/api/campaign/balance",
+        method: "GET",
+        params: {user},
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+      providesTags: ['Users'],
+  }),
   }),
 })
 
@@ -82,4 +93,5 @@ export const {
   useUpdateUserMutation,
   useDeleteUserImageMutation,
   useRegisterUserMutation,
+  useGetUserSmsBalanceQuery,
 } = api;

@@ -23,7 +23,7 @@ const DropzoneContainer = styled(Box)({
 const Icon = styled(FileUploadRoundedIcon)({
   fontSize: '2rem',
   marginBottom: '8px',
-  color: '#6B7280',
+  color: 'black',
 });
 
 function DragNDrop({ setFile }) {

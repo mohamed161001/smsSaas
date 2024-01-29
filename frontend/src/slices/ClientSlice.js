@@ -23,7 +23,7 @@ export const clientSlice = api.injectEndpoints({
                   Authorization: `Bearer ${token}`,
                 },
             }),
-            invalidatesTags: ['Client'],
+            invalidatesTags: ['Client','Group'],
         }),
         addClients : build.mutation({
             query: ({clients,token}) => ({
@@ -34,7 +34,7 @@ export const clientSlice = api.injectEndpoints({
                   Authorization: `Bearer ${token}`,
                 },
             }),
-            invalidatesTags: ['Client'],
+            invalidatesTags: ['Client','Group'],
         }),
         deleteClient: build.mutation({
             query: ({id,token}) => ({
@@ -44,7 +44,7 @@ export const clientSlice = api.injectEndpoints({
                   Authorization: `Bearer ${token}`,
                 },
             }),
-            invalidatesTags: ['Client'],
+            invalidatesTags: ['Client','Group'],
         }),
         getClient: build.query({
             query: ({id,token}) => ({
@@ -65,7 +65,7 @@ export const clientSlice = api.injectEndpoints({
                   Authorization: `Bearer ${token}`,
                 },
             }),
-            invalidatesTags: ['Client'],
+            invalidatesTags: ['Client','Group'],
         }),
     })
 });

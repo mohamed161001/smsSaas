@@ -151,6 +151,9 @@ const sendSMS = async (user, recipientsData, message) => {
           if (error.response && error.response.status === 403) {
             throw new Error('Votre crédit SMS est épuisé veuillez recharger votre compte');
           }
+          // console.log('error sending sms');
+
+          // throw error;
           // Handle other errors as needed
         }
       }
@@ -193,20 +196,38 @@ const createCampaign = async (req,res)=> {
     }
   // ************************************************************************************************************  
 
-
-        const smsResponses = await sendSMS(user, recipientsData, campaignData.recipientsData.message);
-
         // create the campaign in the database
         const campaign = await Campaign.create(
-            {
-                name: campaignData.recipientsData.campaignName,
-                message: campaignData.recipientsData.message,
-                status: "Terminé",
-                client: campaignData.recipientsData.userId,
-            }
+          {
+              name: campaignData.recipientsData.campaignName,
+              message: campaignData.recipientsData.message,
+              status: "En cours",
+              client: campaignData.recipientsData.userId,
+          }
         );
 
-        res.status(200).json({ smsResponses });
+        // const smsResponses = await sendSMS(user, recipientsData, campaignData.recipientsData.message);
+
+        // // update the campaign status
+        // await Campaign.findByIdAndUpdate(campaign._id, { status: "Terminé" });
+
+        // Perform SMS sending operation in the background without waiting for a response
+        sendSMS(user, recipientsData, campaignData.recipientsData.message)
+            .then((smsResponses) => {
+                campaign.status = "Terminé";
+                campaign.creditsUsed = smsResponses.length;
+                campaign.totalDelivered = smsResponses.length;
+                campaign.save(); // Save the updated campaign status
+            })
+            .catch((error) => {
+                // Handle any errors that occur during SMS sending
+                console.error('Error during SMS sending:', error);
+                // Update the campaign status to indicate that it failed
+                campaign.status = "Echoué";
+                campaign.save(); // Save the updated campaign status
+            });
+
+          res.status(200).json({ message: 'Campaign creation initiated successfully' });
 
     } catch (error) {
         res.status(400).json({ error : error.message })

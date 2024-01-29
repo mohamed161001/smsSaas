@@ -190,6 +190,25 @@ const MessageStep = ({message,setMessage}) => {
       }
     };
 
+    // const getPreviewMessage = () => {
+    //   let previewMessage = message;
+    
+    //   // Replace shortcodes
+    //   shortcodes.forEach(({ value, preview }) => {
+    //     previewMessage = previewMessage.replace(new RegExp(value, 'g'), preview);
+    //   });
+    
+    //   // Regular expression to match URLs
+    //   const urlRegex = /(https?:\/\/[^\s]+)/g;
+    
+    //   // Replace each URL with a styled span
+    //   previewMessage = previewMessage.replace(urlRegex, (url) => {
+    //     return `<span style="color: blue; text-decoration: underline; cursor: pointer;" onclick="window.open('${url}', '_blank')">${url}</span>`;
+    //   });
+    
+    //   return <div dangerouslySetInnerHTML={{ __html: previewMessage }} />;
+    // };
+
     const getPreviewMessage = () => {
       let previewMessage = message;
     
@@ -197,6 +216,9 @@ const MessageStep = ({message,setMessage}) => {
       shortcodes.forEach(({ value, preview }) => {
         previewMessage = previewMessage.replace(new RegExp(value, 'g'), preview);
       });
+    
+      // Replace newlines with HTML line breaks
+      previewMessage = previewMessage.replace(/\n/g, '<br>');
     
       // Regular expression to match URLs
       const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -208,6 +230,10 @@ const MessageStep = ({message,setMessage}) => {
     
       return <div dangerouslySetInnerHTML={{ __html: previewMessage }} />;
     };
+    
+
+
+    console.log(message)
     
 
   return (

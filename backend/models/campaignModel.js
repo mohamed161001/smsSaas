@@ -16,7 +16,7 @@ const campaignSchema = new Schema({
         type: String,
         required: false,
         default: "En attente",
-        enum: ["En attente", "En cours", "Terminé","Programmé"]
+        enum: ["En attente", "En cours", "Terminé","Programmé","Echoué"]
     },
     scheduledTime: {
         type: Date,
