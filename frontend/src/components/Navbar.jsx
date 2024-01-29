@@ -40,7 +40,6 @@ const Navbar = ({isSidebarOpen, setIsSidebarOpen}) => {
     const { logout } = useLogout()
     const user = useSelector((state) => state.reducer.user)
     const token = useSelector((state) => state.reducer.token)
-    const apiUrl = import.meta.env.VITE_API_URL;
 
     const { data, isLoading, error } = useGetUserQuery({ 
         id: user?._id || '',

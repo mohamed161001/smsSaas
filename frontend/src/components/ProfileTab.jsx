@@ -177,7 +177,11 @@ const CustomTextField = (props) => {
     const apiUrl = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
-      setImagePreview(`${apiUrl}/${data?.user.image}`);
+      setImagePreview(
+        data?.user.image
+        ? `${import.meta.env.VITE_API_URL}/${data?.user.image}`
+        : ""
+      );
     }, [data])
 
     const handleImageChange = (e) => {
