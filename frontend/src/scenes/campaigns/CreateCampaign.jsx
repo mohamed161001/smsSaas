@@ -19,12 +19,14 @@ import {
     AutoFixHighRounded ,
     SendRounded,
 } from '@mui/icons-material';
+import { useCreateCampaignMutation } from '../../slices/CampaignSlice';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import Phone from '../../assets/Phone.png'
 import FlexBetween from '../../components/FlexBetween';
 import MessageStep from '../../components/MessageStep';
 import TargetingStep from '../../components/TargetingStep';
+import CampaignSentStep from '../../components/CampaignSentStep';
 import CampaignSummary from '../../components/CampaignSummary';
 import { useSelector } from 'react-redux';
 
@@ -69,6 +71,8 @@ const CustomTextField = (props) => {
 const CreateCampaign = () => {
 
   const user = useSelector((state) => state.reducer.user)
+  const client = useSelector((state) => state.reducer.client)
+  const token = useSelector((state) => state.reducer.token)
 
   const isSmsTokenEmpty = user.smsToken === null || user.smsToken === undefined || user.smsToken === ''
   const ismsNumberDevEmpty = user.smsNumberDev === null || user.smsNumberDev === undefined || user.smsNumberDev === ''
@@ -115,6 +119,34 @@ const CreateCampaign = () => {
               return false;
       }
   };
+
+  // create campaign mutation
+  const [createCampaign, { isLoading, isSuccess, isError, error }] = useCreateCampaignMutation()
+
+
+  const handleCampaignSend = async() => {
+    const campaign = {
+      userId: client,
+      campaignName: campaignName,
+      groupId: campaignGroup._id,
+      message: message,
+    }
+    const formattedCampaign = {
+      recipientsData: campaign,
+    }
+    try {
+      const response = await createCampaign({
+        campaign: formattedCampaign,
+        token: token,
+      })
+      console.log(response)
+    }
+    catch (error) {
+      console.log(error)
+    }
+    // move to the next step
+    handleNext()
+  }
 
 
   
@@ -207,7 +239,7 @@ const CreateCampaign = () => {
         <CampaignSummary campaignName={campaignName} campaignGroup={campaignGroup} message={message} setNotEnoughCredits={setNotEnoughCredits} notEnoughCredits={notEnoughCredits} setIsCampiagnSummaryLoading={setIsCampiagnSummaryLoading}/>
       )}
       {activeStep === steps.length  && (
-         <TargetingStep campaignName={campaignName} setCampaignName={setCampaignName} campaignGroup={campaignGroup} setCampaignGroup={setCampaignGroup}/>
+         <CampaignSentStep />
       )}
     </Box>  
       { isSmsTokenEmpty && ismsNumberDevEmpty && 
@@ -253,8 +285,10 @@ const CreateCampaign = () => {
                         </Button>
                         <Button 
                         variant="contained"
-                        onClick={handleNext}
-                        disabled={isNextDisabled() || isSmsTokenEmpty || ismsNumberDevEmpty}
+                        // onClick={handleNext}
+                        onClick={activeStep === steps.length - 1 ? handleCampaignSend : handleNext}
+                        // disabled={isNextDisabled() || isSmsTokenEmpty || ismsNumberDevEmpty}
+                        disabled={isSmsTokenEmpty || ismsNumberDevEmpty || isLoading}
                         startIcon={activeStep === steps.length - 1 ? <SendRounded/> : null}
                         sx={{
                             backgroundColor: "black",

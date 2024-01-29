@@ -9,6 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
+import Box from '@mui/material/Box';
 import CloseIcon from '@mui/icons-material/Close';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
@@ -17,7 +18,11 @@ import MenuItem from '@mui/material/MenuItem';
 import Alert  from '@mui/material/Alert';
 import List from '@mui/material/List';
 import InputAdornment from '@mui/material/InputAdornment';
+import { LinearProgress } from '@mui/material';
 import Snackbar  from '@mui/material/Snackbar';
+import HourglassBottomRoundedIcon from '@mui/icons-material/HourglassBottomRounded';
+import DownloadingRoundedIcon from '@mui/icons-material/DownloadingRounded';
+import CircularProgress from '@mui/material/CircularProgress';
 import * as XLSX from 'xlsx';
 import { SearchRounded } from '@mui/icons-material';
 import {useGetGroupsQuery} from '../slices/GroupSlice'
@@ -112,6 +117,7 @@ export default function ImportMenu({ open, setOpen, setSnackbarOpen, setMessage 
       });
 
 
+
       // import the contacts from the excel file they have name and phone number
       const importContacts = (file) => {
         const reader = new FileReader();
@@ -163,8 +169,6 @@ export default function ImportMenu({ open, setOpen, setSnackbarOpen, setMessage 
       useEffect(() => {
         if (file?.type === 'application/vnd.ms-excel' || file?.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file?.type === 'text/csv') {
           importContacts(file);
-        } else {
-          console.log('Invalid file type. Please choose a CSV or XLSX file.');
         }
       }, [file]);
 
@@ -173,6 +177,7 @@ export default function ImportMenu({ open, setOpen, setSnackbarOpen, setMessage 
             setPopupError('');
         }
     }, [file]);
+
 
       
       // adding the contacts
@@ -204,12 +209,10 @@ export default function ImportMenu({ open, setOpen, setSnackbarOpen, setMessage 
         setSnackbarOpen(true)
         setOpen(false)
         } catch (error) {
-          console.log(error);
           setPopupError(response.error.data.error);
         }
       }
 
-      console.log(uploadedContacts);
 
     // handling the error popup
     const [popupError, setPopupError] = useState('');
@@ -267,7 +270,7 @@ export default function ImportMenu({ open, setOpen, setSnackbarOpen, setMessage 
                     color: '#000',
                     }}
                     >
-                Importer la liste
+                Importer une liste
             </Typography>
             </BootstrapDialogTitle>
             <DialogContent 
@@ -281,17 +284,17 @@ export default function ImportMenu({ open, setOpen, setSnackbarOpen, setMessage 
                         fontWeight: "600",
                         // color: "#6B7280",
                         color: "#000",
-                        marginBottom: "0.9rem",
+                        marginBottom: "0.5rem",
                     }}
                 >
-                   Liste des contacts
+                   Importer un fichier CSV ou XLSX
                 </InputLabel>
                 <Typography
                 variant="body1"
                 sx={{
                   fontSize: '0.65rem',
                   fontWeight: '500',
-                  color: '#000',
+                  color: '#595959',
                   mb: '0.5rem',
                 }}
               >
@@ -305,7 +308,7 @@ export default function ImportMenu({ open, setOpen, setSnackbarOpen, setMessage 
                         fontWeight: "600",
                         // color: "#6B7280",
                         color: "#000",
-                        marginBottom: "0.9rem",
+                        marginBottom: "0.5rem",
                         marginTop: "0.9rem",
                     }}
                 >
@@ -316,11 +319,9 @@ export default function ImportMenu({ open, setOpen, setSnackbarOpen, setMessage 
                     id="group"
                     name="group"
                     value={groups}
-                    // search from backend
                     onInputChange={(event, value) => {
                       setSearch(value);
                     }}
-                    // add loading
                     loading={isFetchingGroups}
                     noOptionsText={
                       <span
@@ -342,7 +343,6 @@ export default function ImportMenu({ open, setOpen, setSnackbarOpen, setMessage 
                         Chargement...
                       </span>
                     }
-                    
                     onChange={(event, value) => {
                       setGroups(value);
                       setSelectedGroups(value.map((group) => group._id));
@@ -443,6 +443,19 @@ export default function ImportMenu({ open, setOpen, setSnackbarOpen, setMessage 
                         }}
                         >{popupError}</Alert>
                     )}
+                     {/* { !isAddingClients &&
+                    <LinearProgress 
+                    sx = {{
+                      marginTop: "0.5rem",
+                      marginBottom: "0rem",
+                      borderRadius: "8px",
+                      // change the color of the bar
+                      '& .MuiLinearProgress-bar': {
+                        backgroundColor: "#000",
+                      },
+                      backgroundColor: "#f2f2f2",
+                    }}/>
+                  } */}
             </DialogContent>
             <DialogActions>
                 <Button 
@@ -466,8 +479,16 @@ export default function ImportMenu({ open, setOpen, setSnackbarOpen, setMessage 
                             boxShadow: "none",
                           },
                       }}
+                      startIcon={isAddingClients ? 
+                      <CircularProgress 
+                      size="1rem"
+                      sx = {{
+                        color: "black",
+                      }}
+                      />
+                      : null}
                 >
-                    Importer
+                    {isAddingClients ? 'en cours' : 'Importer'}
                 </Button>
             </DialogActions>
         </BootstrapDialog>

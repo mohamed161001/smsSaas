@@ -9,6 +9,9 @@ import Tab from '@mui/material/Tab';
 import Divider from '@mui/material/Divider';
 import TextsmsRoundedIcon from '@mui/icons-material/TextsmsRounded';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
+import CardMembershipRoundedIcon from '@mui/icons-material/CardMembershipRounded';
+import SubscriptionsTab from '../../components/SubscriptionsTab'
+import PaymentRoundedIcon from '@mui/icons-material/PaymentRounded';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import TextField from '@mui/material/TextField';
 import ProfileTab from '../../components/ProfileTab';
@@ -89,7 +92,7 @@ function Settings() {
 
   
   return (
-    <Box m="1.5rem 2.5rem" sx = {{backgroundColor: '#fff', borderRadius: '10px' , height:500}}>
+    <Box m="1.5rem 2rem" sx = {{backgroundColor: '#fff', borderRadius: '10px' , height: '85vh'}}>
       <Grid container spacing={2} marginTop={1}>
         <Grid item xs={12} lg={3}>
           <Paper sx={{ p: 2, paddingX: { xs: 4, md: 2 } , backgroundColor: 'transparent' , boxShadow:'none' }}>
@@ -202,17 +205,49 @@ function Settings() {
                     marginBottom: '0.3rem',
                 }}
               />
+              <Tab  
+                label={
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <CardMembershipRoundedIcon sx={{ marginRight: 3 , fontSize:'1.1rem' }} />
+                    <Typography
+                      sx = {{
+                        fontSize :"0.75rem",
+                        fontWeight: 600,
+                        textTransform:'none'
+                      }}
+                    >Abonnement</Typography>
+                  </div>
+                } 
+                {...a11yProps(1)}
+                sx={{
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'start',
+                    '&.Mui-selected': {
+                      color:'#FF6100',
+                      backgroundColor: '#ffefe6',
+                    },
+                    '&:hover': {
+                      backgroundColor: '#efefef',
+                  },
+                    // on hover change background color
+                    minHeight: '2.4rem',
+                    marginBottom: '0.3rem',
+                }}
+              />
             </Tabs>
           </Paper>
         </Grid>
         <Grid item xs={12} lg={9} >
           <Stack direction="column" spacing={2}>
             <Paper sx={{paddingX: { xs: 4, md: 2 },boxShadow:'none'}}>
+              
               <TabPanel value={value} index={0}>
                 <Stack>
                     <ProfileTab />
                 </Stack>
               </TabPanel>
+
              { isUser &&
               <TabPanel value={value} index={1}>
                 <Stack>
@@ -224,6 +259,12 @@ function Settings() {
               <TabPanel value={value} index={isUser ? 2 : 1}>
                 <Stack>
                 <EditPasswordTab />
+                </Stack>
+              </TabPanel>
+
+              <TabPanel value={value} index={isUser ? 3 : 2}>
+                 <Stack>
+                    <SubscriptionsTab />
                 </Stack>
               </TabPanel>
             </Paper>

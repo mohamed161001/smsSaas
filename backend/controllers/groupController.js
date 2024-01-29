@@ -105,14 +105,29 @@ const deleteGroup = async (req, res) => {
     return res.status(404).json({ error: 'Group inexistant' });
   }
   try {
-    const group = await Group.findByIdAndDelete(id);
 
+    // find the contacts that have this group
+    const contacts = await Contact.find({ group: id });
+
+    // identify contacts to delete and contacts to update
+    const contactsToDelete = contacts.filter((contact) => contact.group.length === 1);
+    const contactsToUpdate = contacts.filter((contact) => contact.group.length > 1);
+
+
+    // update the contacts
+    await Contact.updateMany(
+      { _id: { $in: contactsToUpdate.map((contact) => contact._id) } },
+      { $pull: { group: id } }
+    );
+
+    // delete the contacts
+    await Contact.deleteMany({ _id: { $in: contactsToDelete.map((contact) => contact._id) } });
+
+    // delete the group
+    const group = await Group.findByIdAndDelete(id);
     if (!group) {
       return res.status(404).json({ error: 'Group inexistant' });
     }
-
-    // delete all contacts in group
-    await Contact.deleteMany({ group: id });
 
     res.status(200).json({group});
   } catch (error) {

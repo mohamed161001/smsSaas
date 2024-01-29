@@ -164,6 +164,10 @@ const AllCampaignsTable = () => {
               color = "#F95757";
               backgroundColor = "#FFE6E6";
               break;
+            case 'En cours':
+              color = "#efb100";
+              backgroundColor = "#fff4d6";
+              break;
             default:
               color = '#F95757';
               backgroundColor = '#FFCACA';

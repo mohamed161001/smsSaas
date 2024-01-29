@@ -203,7 +203,6 @@ const CustomTextField = (props) => {
       }
     }
 
-
   useEffect(() => {
     if (error && error.status === 401) {
       logout()
@@ -263,7 +262,7 @@ const CustomTextField = (props) => {
                           boxShadow: "none",
                           margin: "1rem 0rem",
                           '&:hover': {
-                            backgroundColor: "#c94d00",
+                            backgroundColor: "#2b2b2b",
                             boxShadow: "none",
                           },
                         }}
@@ -491,7 +490,7 @@ const CustomTextField = (props) => {
                       textTransform: "none",
                       margin: "1rem 0rem",
                       '&:hover': {
-                        backgroundColor: "#c94d00",
+                        backgroundColor: "#2b2b2b",
                         boxShadow: "none",
                       },
                     }}

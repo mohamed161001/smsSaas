@@ -29,12 +29,12 @@ app.use((req, res, next) => {
 
 // routes
 app.use('/auth', authRouter);
+app.use(authMiddleware);
 app.use('/api/user', userRoutes);
 app.use('/api/client', clientRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/group', groupRoutes);
 app.use('/api/campaign', campaignRoutes);
-app.use(authMiddleware);
 app.use('/api/profile',profileRoutes);
 
 //connect to mongodb

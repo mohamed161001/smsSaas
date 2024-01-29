@@ -205,8 +205,6 @@ const createContacts = async (req, res) => {
           });
         })
       );
-      
-
     }
 
     if (filteredContactsToInsert.length === 0) {
@@ -215,7 +213,6 @@ const createContacts = async (req, res) => {
 
     const createdContacts = await Contact.insertMany(filteredContactsToInsert);
 
-    
     // return a message with the number of created contacts
     res.status(200).json({ message});
   } catch (error) {

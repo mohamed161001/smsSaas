@@ -18,11 +18,6 @@ const contactSchema = new Schema({
         required: true,
         default: ""
     },
-    // lastName: {
-    //     type: String,
-    //     required: true,
-    //     default: ""
-    // },
     phoneNumber: {
         type: String,
         required: true,
@@ -34,26 +29,6 @@ const contactSchema = new Schema({
         ref: 'Group',
         default: []
     },
-    // group: {
-    //     type : mongoose.Types.ObjectId,
-    //     ref: 'Group',
-    //     default: null
-    // },
-    // additionalPhoneNumber: {
-    //     type: String,
-    //     required: false,
-    //     default: ""
-    // },
-    // city: {
-    //     type: String,
-    //     required: false,
-    //     default: ""
-    // },
-    // address: {
-    //     type: String,
-    //     required: false,
-    //     default: ""
-    // },
     images: {
         type: [imageSchema],
         default: []

@@ -54,6 +54,20 @@ const UserSchema = new Schema ({
         type: String,
         default: '',
     },
+    // subscription: {
+    //     type: String,
+    //     enum: ['monthly', 'yearly'],
+    //     required: false,
+    //     default: "monthly"
+    // },
+    monthlySubscriptionLink: {
+        type: String,
+        required : false,
+    },
+    yearlySubscriptionLink: {
+        type: String,
+        required : false,
+    },
     payments : [{
         type : mongoose.Types.ObjectId,
         ref: 'doctorPayment',
